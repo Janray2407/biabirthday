@@ -1,0 +1,13 @@
+<h2>Admin Dashboard</h2>
+
+<script>
+
+const user = JSON.parse(localStorage.getItem("user"))
+
+if(!user || user.role !== "admin"){
+window.location.href = "index.html"
+}
+
+document.write("Welcome Admin " + user.name)
+
+</script>
