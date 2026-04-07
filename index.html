@@ -1,24 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Login</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-
-<body>
-
-<h2>Login</h2>
-
-<input type="email" id="email" placeholder="Email"><br><br>
-<input type="password" id="password" placeholder="Password"><br><br>
-
-<button onclick="login()">Login</button>
-
 <script>
 
-const supabase = window.supabase.createClient(
+const { createClient } = supabase
+
+const supabaseClient = createClient(
 "https://hhtulgtzdfcifksrhqwv.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhodHVsZ3R6ZGZjaWZrc3JocXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MjkwNTcsImV4cCI6MjA5MDUwNTA1N30.ckFHNZVOX7G-8cFd0pWnmsZWyH27KrxZgdSwbD89-x8"
+"YOUR_ANON_KEY"
 );
 
 async function login(){
@@ -26,7 +12,7 @@ async function login(){
 const email = document.getElementById("email").value
 const password = document.getElementById("password").value
 
-const { data, error } = await supabase
+const { data, error } = await supabaseClient
 .from("users")
 .select("*")
 .eq("email", email)
@@ -37,7 +23,6 @@ if(data){
 
 localStorage.setItem("user", JSON.stringify(data))
 
-// redirect based on role
 if(data.role == "admin"){
 window.location.href = "admin.html"
 }else{
@@ -51,6 +36,3 @@ alert("Invalid Login")
 }
 
 </script>
-
-</body>
-</html>
