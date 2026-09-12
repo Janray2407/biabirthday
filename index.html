@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azrianna Bia - Birthday Invitation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { min-height: 100vh; background-image: url('https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/birthday-invitation-bg.png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        .overlay { min-height: 100vh; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(75,0,130,0.4) 60%, rgba(138,43,226,0.5) 100%); padding-top: 5rem; }
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; padding: 1rem 2rem; display: flex; justify-content: center; gap: 1.5rem; background: rgba(75,0,130,0.6); backdrop-filter: blur(10px); z-index: 100; flex-wrap: wrap; }
+        .navbar a { color: white; text-decoration: none; font-size: 0.9rem; padding: 8px 18px; border-radius: 25px; transition: all 0.3s ease; cursor: pointer; }
+        .navbar a:hover, .navbar a.active { background: rgba(138,43,226,0.6); transform: translateY(-2px); }
+        .section { display: none; min-height: 100vh; }
+        .section.active { display: block; }
+        .content { text-align: center; color: white; padding: 2rem; }
+        .content h1 { font-size: 2.5rem; text-shadow: 2px 2px 8px rgba(0,0,0,0.5); margin-bottom: 1.5rem; }
+        .btn { display: inline-block; padding: 15px 40px; font-size: 1.1rem; color: white; background: linear-gradient(135deg, #8a2be2, #ff69b4); border: none; border-radius: 50px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(138,43,226,0.4); transition: all 0.3s ease; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(138,43,226,0.6); }
+        .container { display: flex; width: 100%; padding: 2rem; gap: 2rem; flex-wrap: wrap; }
+        .left-panel, .right-panel { flex: 1; display: flex; flex-direction: column; gap: 1.5rem; padding: 1rem; min-width: 280px; }
+        .info-card, .venue-card, .church-photo { background: rgba(75,0,130,0.6); backdrop-filter: blur(10px); border-radius: 20px; padding: 2rem; color: white; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .info-card h2, .venue-card h2, .church-photo h2 { font-size: 1.5rem; margin-bottom: 1rem; text-shadow: 2px 2px 8px rgba(0,0,0,0.5); border-bottom: 2px solid rgba(255,105,180,0.5); padding-bottom: 0.5rem; }
+        .detail { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; font-size: 1rem; }
+        .church-img-placeholder { width: 100%; height: 200px; background: rgba(255,255,255,0.2); border-radius: 15px; display: flex; align-items: center; justify-content: center; border: 2px dashed rgba(255,255,255,0.5); }
+        .godparents-container { display: flex; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .godparents-section { flex: 1; min-width: 250px; }
+        .godparents-section h2 { font-size: 1.5rem; color: #ff69b4; margin-bottom: 1rem; }
+        .godparents-list { list-style: none; text-align: left; }
+        .godparents-list li { padding: 0.5rem 1rem; margin-bottom: 0.5rem; background: rgba(255,255,255,0.1); border-radius: 10px; font-size: 1rem; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1.5rem; max-width: 900px; margin: 0 auto 2rem; }
+        .gallery-item { background: rgba(75,0,130,0.6); backdrop-filter: blur(10px); border-radius: 15px; padding: 1rem; min-height: 200px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3); cursor: pointer; transition: all 0.3s ease; }
+        .gallery-item:hover { transform: scale(1.05); box-shadow: 0 12px 40px rgba(138,43,226,0.5); }
+        .gallery-item img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+        .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; justify-content: center; align-items: center; }
+        .lightbox.active { display: flex; }
+        .lightbox-content { max-width: 90%; max-height: 90%; position: relative; animation: magicalIn 0.6s ease; }
+        .lightbox-content img { max-width: 100%; max-height: 80vh; border-radius: 15px; box-shadow: 0 0 60px rgba(138,43,226,0.6); }
+        .lightbox-close { position: absolute; top: -50px; right: 0; color: white; font-size: 2.5rem; cursor: pointer; transition: all 0.3s ease; }
+        .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); color: white; font-size: 2rem; cursor: pointer; padding: 1rem; }
+        .lightbox-prev { left: -60px; } .lightbox-next { right: -60px; }
+        .glitter-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden; }
+        .glitter { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle, rgba(255,215,0,1) 0%, rgba(255,105,180,0.8) 50%, transparent 100%); border-radius: 50%; animation: glitterFall linear infinite; opacity: 0; }
+        @keyframes glitterFall { 0% { transform: translateY(-100px) rotate(0deg) scale(0); opacity: 0; } 10% { opacity: 1; transform: translateY(0) rotate(36deg) scale(1); } 100% { transform: translateY(100vh) rotate(720deg) scale(0.5); opacity: 0; } } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes magicalIn { from { transform: scale(0.5) rotate(-10deg); opacity: 0; filter: blur(10px); } to { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0); } } @keyframes sparkle { 0%, 100% { box-shadow: 0 0 60px rgba(138,43,226,0.6), 0 0 120px rgba(255,105,180,0.3); } 50% { box-shadow: 0 0 80px rgba(255,105,180,0.8), 0 0 150px rgba(138,43,226,0.5), 0 0 200px rgba(255,255,255,0.2); } } @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } } @keyframes shimmer { 0%, 100% { filter: brightness(1) saturate(1); } 50% { filter: brightness(1.2) saturate(1.3); } } @keyframes morphIn { 0% { transform: scale(0.8) rotateY(90deg); filter: blur(20px) brightness(2); opacity: 0; } 50% { transform: scale(1.1) rotateY(0deg); filter: blur(5px) brightness(1.5); opacity: 0.8; } 100% { transform: scale(1) rotateY(0deg); filter: blur(0) brightness(1); opacity: 1; } }
+    </style>
+</head>
+<body><div class="glitter-container" id="glitter-container"></div>
+    <nav class="navbar">
+        <a onclick="showSection('home')" class="active">Home</a>
+        <a onclick="showSection('godparents')">God Parents</a>
+        <a onclick="showSection('photos')">Photo Album</a>
+        <a onclick="showSection('gifts')">Gift Ideas</a>
+        <a onclick="showSection('dresscode')">Dress Code</a>
+    </nav>
+    <div id="home" class="section active">
+        <div class="overlay" style="display:flex;align-items:flex-end;justify-content:center;padding-bottom:3rem;">
+            <div class="content"><h1>Azrianna Bia</h1><button class="btn" onclick="enterInvitation()">Open the invitation</button></div>
+        </div>
+    </div>
+    <div id="invitation" class="section">
+        <div class="overlay">
+            <div class="greeting"><h1>Happy Birthday Azrianna Bia!</h1></div>
+            <div class="container">
+                <div class="left-panel">
+                    <div class="info-card"><h2>Christening Ceremony</h2><div class="detail"><p>?? October 24, 2026</p></div><div class="detail"><p>? 6:00 AM</p></div><div class="detail"><p>?? Church of San Juan Batangas</p></div></div>
+                    <div class="church-photo"><h2>Church Photo</h2><div class="church-img-placeholder"><p>Insert Church Picture Here</p></div></div>
+                </div>
+                <div class="right-panel">
+                    <div class="venue-card"><h2>Reception Venue</h2><div class="detail"><p>?? McDonald's San Juan Batangas</p></div><div class="detail"><p>?? Party after the ceremony</p></div></div>
+                    <div class="church-photo"><h2>McDonald's Photo</h2><div class="church-img-placeholder"><p>Insert McDonald's Picture Here</p></div></div>
+                </div>
+            </div>
+            <div style="text-align:center;padding:2rem;"><button class="btn" onclick="showSection('home')">Back</button></div>
+        </div>
+    </div>
+    <div id="godparents" class="section">
+        <div class="overlay">
+            <div class="content">
+                <h1>God Parents</h1>
+                <div class="godparents-container">
+                    <div class="godparents-section"><h2>Ninong (Godfathers)</h2><ul class="godparents-list"><li>1. Christopher Ramirez</li><li>2. Erickson Lacson</li><li>3. Ronald Endaya</li><li>4. Ivan Iyas</li><li>5. Jerico Olaya</li><li>6. Lucky Jay Rovelo</li></ul></div>
+                    <div class="godparents-section"><h2>Ninang (Godmothers)</h2><ul class="godparents-list"><li>1. Janice Costa</li><li>2. Alaina Sevilla</li><li>3. Chris Tin</li><li>4. Alvie Jane Macalalad</li><li>5. Rhainzlyn Mae Macalalad</li><li>6. Rhona Lumanglas</li><li>7. Kecelyn Mataverde</li><li>8. Shiela Mae Salvador</li><li>9. Avi Jen Dela-Fuente</li></ul></div>
+                </div>
+                <button class="btn" onclick="showSection('home')">Back to Home</button>
+            </div>
+        </div>
+    </div>
+    <div id="photos" class="section">
+        <div class="overlay">
+            <div class="content">
+                <h1>Photo Album</h1>
+                <div class="gallery">
+                    <div class="gallery-item" onclick="openLightbox(0)"><img src="https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/3.png" alt="Photo 1"></div>
+                    <div class="gallery-item" onclick="openLightbox(1)"><img src="https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/invitation-5.png" alt="Photo 2"></div>
+                    <div class="gallery-item" onclick="openLightbox(2)"><img src="https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/invitation-6.png" alt="Photo 3"></div>
+                    <div class="gallery-item" onclick="openLightbox(3)"><img src="https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/photo-background-edit.png" alt="Photo 4"></div>
+                </div>
+                <button class="btn" onclick="showSection('home')">Back to Home</button>
+            </div>
+        </div>
+    </div>
+    <div id="gifts" class="section">
+        <div class="overlay"><div class="content"><h1>Gift Ideas</h1><p style="font-size:1.2rem;line-height:1.8;">Your prayers, love and presence are highly appreciated, but if you were thinking of a gift, any gift would be appreciated.</p><button class="btn" onclick="showSection('home')">Back to Home</button></div></div>
+    </div>
+    <div id="dresscode" class="section">
+        <div class="overlay"><div class="content"><h1>Dress Code</h1><p style="font-size:1.3rem;">Any what they want! Come as you are and celebrate with us!</p><button class="btn" onclick="showSection('home')">Back to Home</button></div></div>
+    </div>
+    <div class="lightbox" id="lightbox"><div class="lightbox-content"><span class="lightbox-close" onclick="closeLightbox()">&times;</span><span class="lightbox-nav lightbox-prev" onclick="prevPhoto()">&#10094;</span><img id="lightbox-img" src=""><span class="lightbox-nav lightbox-next" onclick="nextPhoto()">&#10095;</span></div></div>
+    <audio id="bgMusic" loop><source src="https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/sounds/background.m4a" type="audio/mp4"></audio>
+    <audio id="godParentsMusic"><source src="https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/sounds/GodParents.m4a" type="audio/mp4"></audio>
+    <script>
+        var photos=['https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/3.png','https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/invitation-5.png','https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/invitation-6.png','https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/photo-background-edit.png'];
+        var currentPhoto=0;var autoSlide;
+        function enterInvitation(){
+            var bg=document.getElementById('bgMusic');
+            bg.volume=0.3;
+            var playPromise=bg.play();
+            if(playPromise!==undefined){
+                playPromise.then(function(){
+                    console.log('Music playing');
+                }).catch(function(error){
+                    console.log('Audio blocked:',error);
+                });
+            }
+            showSection('invitation');
+        }
+        function showSection(id){
+            document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
+            document.getElementById(id).classList.add('active');
+            var gp=document.getElementById('godParentsMusic');
+            if(id==='godparents'){
+                gp.currentTime=0;
+                gp.volume=1;
+                gp.play().catch(function(e){console.log('GP audio:',e)});
+            }else{
+                gp.pause();
+            }
+        }
+        function openLightbox(i){currentPhoto=i;var img=document.getElementById('lightbox-img');img.src=photos[i];img.classList.add('magical');document.getElementById('lightbox').classList.add('active');startAutoSlide()}
+        function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.getElementById('lightbox-img').classList.remove('magical');clearInterval(autoSlide)}
+        function nextPhoto(){var img=document.getElementById('lightbox-img');img.classList.remove('magical');img.classList.add('transitioning');currentPhoto=(currentPhoto+1)%photos.length;img.src=photos[currentPhoto];setTimeout(function(){img.classList.remove('transitioning');img.classList.add('magical')},800)}
+        function prevPhoto(){var img=document.getElementById('lightbox-img');img.classList.remove('magical');img.classList.add('transitioning');currentPhoto=(currentPhoto-1+photos.length)%photos.length;img.src=photos[currentPhoto];setTimeout(function(){img.classList.remove('transitioning');img.classList.add('magical')},500)}
+        function createGlitter(){var c=document.getElementById('glitter-container');for(var i=0;i<50;i++){var g=document.createElement('div');g.className='glitter';g.style.left=Math.random()*100+'%';g.style.animationDuration=(Math.random()*3+2)+'s';g.style.animationDelay=Math.random()*5+'s';g.style.width=g.style.height=(Math.random()*8+4)+'px';c.appendChild(g)}}
+        function startAutoSlide(){clearInterval(autoSlide);autoSlide=setInterval(nextPhoto,2500)}
+        createGlitter();
+    </script>
+</body>
+</html>
+
+
