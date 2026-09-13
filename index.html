@@ -8,14 +8,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { min-height: 100vh; background-image: url('https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/birthday-invitation-bg.png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         .overlay { min-height: 100vh; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(75,0,130,0.4) 60%, rgba(138,43,226,0.5) 100%); padding-top: 5rem; }
-        .navbar { display: none; position: fixed; top: 0; left: 0; width: 100%; padding: 1rem 2rem; justify-content: center; gap: 1.5rem; background: rgba(75,0,130,0.8); backdrop-filter: blur(10px); z-index: 100; flex-wrap: wrap; }
-        .navbar.visible { display: flex; }
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; padding: 1rem 2rem; display: flex; justify-content: center; gap: 1.5rem; background: rgba(75,0,130,0.6); backdrop-filter: blur(10px); z-index: 100; flex-wrap: wrap; }
         .navbar a { color: white; text-decoration: none; font-size: 0.9rem; padding: 8px 18px; border-radius: 25px; transition: all 0.3s ease; cursor: pointer; }
         .navbar a:hover, .navbar a.active { background: rgba(138,43,226,0.6); transform: translateY(-2px); }
-        @media (max-width: 768px){
-            .navbar { padding: 0.4rem 0.5rem; gap: 0.3rem; top: 0; width: 100%; }
-            .navbar a { font-size: 0.7rem; padding: 4px 8px; border-radius: 12px; flex: 1 1 auto; text-align: center; white-space: nowrap; min-width: auto; }
-        }
         .section { display: none; min-height: 100vh; }
         .section.active { display: block; }
         .content { text-align: center; color: white; padding: 2rem; }
@@ -117,7 +112,6 @@
         var photos=['https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/3.png','https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/invitation-5.png','https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/invitation-6.png','https://hhtulgtzdfcifksrhqwv.supabase.co/storage/v1/object/public/photos/photo-background-edit.png'];
         var currentPhoto=0;var autoSlide;
         function enterInvitation(){
-            document.querySelector('.navbar').classList.add('visible');
             var bg=document.getElementById('bgMusic');
             bg.volume=0.3;
             var playPromise=bg.play();
