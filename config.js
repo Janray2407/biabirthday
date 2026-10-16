@@ -1,5 +1,5 @@
-const SUPABASE_URL = 'http://127.0.0.1:54321';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
+const SUPABASE_URL = 'https://hhtulgtzdfcifksrhqwv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhodHVsZ3R6ZGZjaWZrc3JocXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MjkwNTcsImV4cCI6MjA5MDUwNTA1N30.ckFHNZVOX7G-8cFd0pWnmsZWyH27KrxZgdSwbD89-x8';
 const SUPABASE_BUCKET = 'birthday-photos';
 
 const PHOTOS = {
