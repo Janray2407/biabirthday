@@ -1,1 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azrianna Bia - Birthday Invitation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #ffd9ec 0%, #c9a7e8 55%, #9b6fd0 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        #bg-img {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            z-index: -1; opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+        #bg-img.loaded { opacity: 1; }
 
+        .overlay {
+            min-height: 100vh;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(75,0,130,0.4) 60%, rgba(138,43,226,0.5) 100%);
+            padding-top: 5rem;
+        }
+
+        /* ===== Navbar ===== */
+        .navbar {
+            display: none;
+            position: fixed; top: 0; left: 0;
+            width: 100%; padding: 1rem 1.5rem;
+            justify-content: center; gap: 0.8rem;
+            background: rgba(75,0,130,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 100; flex-wrap: wrap;
+        }
+        .navbar.visible { display: flex; }
+        .navbar a {
+            color: white; text-decoration: none;
+            font-size: 0.8rem; padding: 8px 14px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer; white-space: nowrap;
+        }
+        .navbar a:hover, .navbar a.active {
+            background: rgba(138,43,226,0.7);
+            transform: translateY(-2px);
+        }
+
+        /* ===== Sections with magical reveal ===== */
+        .section { display: none; min-height: 100vh; }
+        .section.active {
+            display: block;
+            animation: magicalReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes magicalReveal {
+            0%   { opacity: 0; transform: scale(0.94); filter: blur(12px); }
+            60%  { opacity: 0.9; filter: blur(2px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        .content { text-align: center; color: white; padding: 2rem; }
+        .content h1 {
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            margin-bottom: 1.5rem;
+        }
+        .content > p {
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            color: white;
+            background: linear-gradient(135deg, #8a2be2, #ff69b4);
+            border: none; border-radius: 50px;
+            cursor: pointer; text-decoration: none;
+            box-shadow: 0 4px 15px rgba(138,43,226,0.4);
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(138,43,226,0.6);
+        }
+
+        .tour-progress {
+            position: fixed; top: 0; left: 0;
+            height: 3px; width: 0%;
+            background: linear-gradient(90deg, #ff69b4, #ffd700, #8a2be2);
+            box-shadow: 0 0 10px rgba(255,105,180,0.9), 0 0 20px rgba(255,215,0,0.6);
+            z-index: 200; transition: width linear; opacity: 0;
+        }
+        .tour-progress.active { opacity: 1; }
+
+        /* ===== Venue ===== */
+        .container {
+            display: flex; width: 100%;
+            padding: 2rem; gap: 2rem;
+            flex-wrap: wrap;
+            max-width: 1200px; margin: 0 auto;
+        }
+        .left-panel, .right-panel {
+            flex: 1 1 380px;
+            display: flex; flex-direction: column; gap: 1.5rem;
+            min-width: 0;
+        }
+        .info-card, .venue-card, .church-photo {
+            background: rgba(75,0,130,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 2rem;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .info-card h2, .venue-card h2, .church-photo h2 {
+            font-size: 1.5rem; margin-bottom: 1rem;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            border-bottom: 2px solid rgba(255,105,180,0.5);
+            padding-bottom: 0.5rem;
+        }
+        .detail {
+            display: flex; align-items: flex-start;
+            gap: 0.7rem; margin-bottom: 0.8rem;
+            font-size: 1rem; text-align: left;
+            line-height: 1.4;
+            word-break: break-word; overflow-wrap: anywhere;
+        }
+        .detail span { flex: 1; min-width: 0; word-break: break-word; overflow-wrap: anywhere; }
+        .church-img-placeholder {
+            width: 100%; height: 360px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px dashed rgba(255,255,255,0.5);
+            overflow: hidden;
+        }
+        .church-img-placeholder img {
+            width: 100%; height: 100%;
+            object-fit: cover; border-radius: 15px;
+        }
+        .church-img-placeholder .loading-text {
+            color: rgba(255,255,255,0.7); font-size: 0.9rem;
+        }
+
+        /* Shared map link style */
+        .map-link {
+            display: inline-block;
+            margin-top: 0.8rem; padding: 10px 22px;
+            background: linear-gradient(135deg, #8a2be2, #ff69b4);
+            color: #ffffff; font-weight: 700; text-decoration: none;
+            border-radius: 30px; transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4);
+            text-align: center;
+        }
+        .map-link:hover {
+            transform: translateY(-2px) scale(1.05);
+            background: linear-gradient(135deg, #ff69b4, #8a2be2);
+            box-shadow: 0 6px 18px rgba(138, 43, 226, 0.7);
+        }
+
+        /* ===== Godparents ===== */
+        .godparents-container {
+            display: flex; gap: 2rem;
+            margin-top: 1.5rem; flex-wrap: wrap;
+            justify-content: center;
+        }
+        .godparents-section {
+            flex: 1; min-width: 250px; max-width: 400px;
+            background: rgba(75,0,130,0.55);
+            backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .godparents-section h2 {
+            font-size: 1.6rem; color: #ff69b4;
+            margin-bottom: 1rem; font-weight: 700;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .godparents-list { list-style: none; text-align: left; }
+        .godparents-list li {
+            padding: 0.7rem 1rem 0.7rem 1.4rem;
+            margin-bottom: 0.6rem;
+            background: rgba(0,0,0,0.35);
+            border-radius: 10px; border-left: 4px solid #ff69b4;
+            color: #fff; font-size: 1rem; font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+            word-break: break-word;
+        }
+
+        /* ===== Carousel ===== */
+        .carousel-wrap {
+            max-width: 900px; margin: 0 auto 2rem;
+            position: relative;
+        }
+        .carousel-stage {
+            position: relative; width: 100%;
+            aspect-ratio: 16 / 10; max-height: 70vh;
+            background: rgba(75,0,130,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 22px; overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+            border: 2px solid rgba(255,105,180,0.4);
+        }
+        .carousel-slide {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transform: scale(1.04);
+            transition: opacity 0.8s ease, transform 1.2s ease;
+            pointer-events: none;
+        }
+        .carousel-slide.active {
+            opacity: 1; transform: scale(1); pointer-events: auto;
+        }
+        .carousel-slide img {
+            width: 100%; height: 100%;
+            object-fit: cover; border-radius: 20px;
+        }
+        .carousel-slide .placeholder-text {
+            color: rgba(255,255,255,0.75); font-size: 1rem;
+        }
+        .carousel-slide.active::after {
+            content:''; position: absolute; inset: 0;
+            border-radius: 20px;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.18) 90deg, transparent 180deg);
+            animation: shimmer-sweep 5s linear infinite;
+            pointer-events: none; opacity: 0.7;
+        }
+        .carousel-dots {
+            display: flex; justify-content: center;
+            flex-wrap: wrap; gap: 8px; margin-top: 1rem;
+        }
+        .carousel-dots .dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: rgba(255,255,255,0.35); cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .carousel-dots .dot.active {
+            background: linear-gradient(135deg, #ff69b4, #ffd700);
+            transform: scale(1.4);
+            box-shadow: 0 0 12px rgba(255,105,180,0.9);
+        }
+        .carousel-counter {
+            text-align: center; margin-top: 0.6rem;
+            color: rgba(255,255,255,0.85); font-size: 0.9rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+            letter-spacing: 1px;
+        }
+        .carousel-arrow {
+            position: absolute; top: 50%;
+            transform: translateY(-50%);
+            width: 46px; height: 46px; border-radius: 50%;
+            background: rgba(75,0,130,0.7); color: white;
+            border: 2px solid rgba(255,255,255,0.5);
+            font-size: 1.4rem; display: flex;
+            align-items: center; justify-content: center;
+            cursor: pointer; z-index: 5;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(6px);
+        }
+        .carousel-arrow:hover {
+            background: linear-gradient(135deg, #8a2be2, #ff69b4);
+            transform: translateY(-50%) scale(1.15);
+            box-shadow: 0 0 20px rgba(255,105,180,0.8);
+        }
+        .carousel-prev { left: 12px; }
+        .carousel-next { right: 12px; }
+
+        /* ===== Message cards ===== */
+        .message-card-large {
+            max-width: 700px; margin: 0 auto 2rem;
+            padding: 2.5rem 2rem;
+            background: rgba(75,0,130,0.55);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+            border: 2px solid rgba(255,105,180,0.4);
+            text-align: center;
+        }
+        .message-text {
+            font-size: 1.2rem; line-height: 1.7;
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+            margin-bottom: 1.5rem;
+            word-break: break-word;
+        }
+        .message-note {
+            font-size: 1.1rem; font-weight: 700;
+            color: #ff69b4;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+            letter-spacing: 0.5px; word-break: break-word;
+        }
+        .message-note.gift-note-color {
+            color: #ffb6c1; font-style: italic;
+        }
+
+        /* ===== Lightbox ===== */
+        .lightbox {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 200; justify-content: center; align-items: center;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox-content {
+            max-width: 90%; max-height: 90%;
+            position: relative;
+            animation: magicalIn 0.5s ease;
+        }
+        .lightbox-content::before {
+            content:''; position: absolute;
+            inset: -16px; border-radius: 34px;
+            background: conic-gradient(from 0deg, rgba(255,105,180,0), rgba(255,105,180,0.55), rgba(138,43,226,0.55), rgba(255,215,0,0.4), rgba(255,105,180,0));
+            filter: blur(16px);
+            -webkit-mask: radial-gradient(closest-side, transparent 62%, #000 100%);
+            mask: radial-gradient(closest-side, transparent 62%, #000 100%);
+            z-index: -1; animation: haloSpin 7s linear infinite;
+        }
+        .lightbox-content img {
+            max-width: 100%; max-height: 80vh;
+            border-radius: 18px;
+            box-shadow: 0 0 30px rgba(138,43,226,0.8), 0 0 80px rgba(255,105,180,0.5), 0 0 150px rgba(255,215,0,0.15);
+            animation: sparkle 3.5s ease-in-out infinite;
+            will-change: transform, opacity, filter;
+        }
+        .lightbox-content img.magical {
+            animation: morphIn 0.7s cubic-bezier(0.22,1.2,0.36,1), sparkle 3.5s ease-in-out 0.5s infinite;
+        }
+        .lightbox-content img.transitioning {
+            animation: photoOut 0.45s ease forwards;
+        }
+        .lightbox-close {
+            position: absolute; top: -50px; right: 0;
+            color: white; font-size: 2.5rem;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .lightbox-close:hover {
+            color: #ff69b4;
+            transform: scale(1.3) rotate(90deg);
+            text-shadow: 0 0 18px rgba(255,105,180,0.9);
+        }
+        .lightbox-nav {
+            position: absolute; top: 50%;
+            transform: translateY(-50%);
+            color: white; font-size: 2rem;
+            cursor: pointer; padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        .lightbox-prev { left: -60px; }
+        .lightbox-next { right: -60px; }
+        .lightbox-prev:hover, .lightbox-next:hover {
+            color: #ff69b4;
+            text-shadow: 0 0 18px rgba(255,105,180,0.9);
+            transform: translateY(-50%) scale(1.25);
+        }
+
+        /* ===== Glitter + music ===== */
+        .glitter-container {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 999; overflow: hidden;
+        }
+        .glitter {
+            position: absolute; width: 10px; height: 10px;
+            background: radial-gradient(circle, rgba(255,215,0,1) 0%, rgba(255,105,180,0.8) 50%, transparent 100%);
+            border-radius: 50%;
+            animation: glitterFall linear infinite; opacity: 0;
+        }
+        .music-toggle {
+            position: fixed; bottom: 25px; right: 25px;
+            width: 55px; height: 55px; border-radius: 50%;
+            background: linear-gradient(135deg, #8a2be2, #ff69b4);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            color: white; font-size: 1.5rem;
+            cursor: pointer; z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.6), 0 0 30px rgba(255, 105, 180, 0.4);
+            transition: all 0.3s ease;
+            animation: musicPulse 2.5s ease-in-out infinite;
+        }
+        .music-toggle:hover {
+            transform: scale(1.15) rotate(8deg);
+            box-shadow: 0 6px 28px rgba(138, 43, 226, 0.9), 0 0 50px rgba(255, 105, 180, 0.7);
+        }
+        .music-toggle.playing { animation: musicPulse 1.2s ease-in-out infinite; }
+        .music-toggle.muted {
+            background: linear-gradient(135deg, #6c6c6c, #9b9b9b);
+            animation: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ===== Mobile ===== */
+        @media (max-width: 768px){
+            .overlay { padding-top: 4.5rem; }
+            .navbar { padding: 0.5rem 0.4rem; gap: 0.25rem; }
+            .navbar a {
+                font-size: 0.62rem; padding: 5px 8px;
+                border-radius: 12px; flex: 1 1 auto; text-align: center;
+            }
+
+            .content { padding: 1.2rem 0.9rem; }
+            .content h1 { font-size: 1.7rem; margin-bottom: 1rem; }
+            .content > p { font-size: 0.95rem; margin-bottom: 0.8rem; }
+            .btn { padding: 13px 32px; font-size: 1rem; }
+
+            /* ===== VENUE MOBILE LAYOUT ===== */
+            .container { 
+                padding: 0.8rem; 
+                gap: 1rem;
+                flex-direction: column;
+            }
+            .left-panel, .right-panel { 
+                flex: 1 1 100%; 
+                gap: 0.8rem; 
+                padding: 0;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: stretch;
+            }
+            .info-card { 
+                flex: 0 0 60%;
+                min-width: 0;
+                padding: 0.9rem 0.7rem;
+                border-radius: 14px;
+            }
+            .church-photo { 
+                flex: 0 0 calc(40% - 0.8rem);
+                min-width: 0;
+                padding: 0.9rem 0.7rem;
+                border-radius: 14px;
+                display: flex;
+                flex-direction: column;
+            }
+            .info-card h2, .church-photo h2 { 
+                font-size: 0.95rem; 
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.35rem;
+                line-height: 1.2;
+            }
+            .detail { 
+                font-size: 0.72rem; 
+                gap: 0.35rem; 
+                margin-bottom: 0.45rem;
+                line-height: 1.3;
+            }
+            .church-img-placeholder { 
+                height: auto; 
+                flex: 1; 
+                min-height: 0;
+                aspect-ratio: 1 / 1;
+                border-radius: 10px;
+            }
+            .church-img-placeholder img {
+                border-radius: 10px;
+            }
+            .church-img-placeholder .loading-text {
+                font-size: 0.65rem;
+                text-align: center;
+                padding: 0 0.3rem;
+            }
+            .map-link {
+                display: block; 
+                width: 100%; 
+                padding: 7px 8px; 
+                font-size: 0.68rem;
+                margin-top: 0.5rem;
+                border-radius: 20px;
+            }
+
+            .godparents-container { gap: 1rem; margin-top: 1rem; }
+            .godparents-section { min-width: 0; padding: 1.2rem 1rem; border-radius: 16px; }
+            .godparents-section h2 { font-size: 1.25rem; }
+            .godparents-list li { font-size: 0.9rem; padding: 0.6rem 0.8rem 0.6rem 1rem; }
+
+            .carousel-arrow { width: 38px; height: 38px; font-size: 1.1rem; }
+            .carousel-prev { left: 6px; }
+            .carousel-next { right: 6px; }
+            .carousel-stage { aspect-ratio: 4 / 3; }
+
+            .message-card-large { padding: 1.4rem 1rem; border-radius: 18px; margin-bottom: 1rem; }
+            .message-text { font-size: 0.98rem; line-height: 1.55; margin-bottom: 1rem; }
+            .message-note { font-size: 0.9rem; }
+
+            .lightbox-close { top: -42px; font-size: 2rem; }
+            .lightbox-prev { left: -6px; padding: 0.5rem; font-size: 1.6rem; }
+            .lightbox-next { right: -6px; padding: 0.5rem; font-size: 1.6rem; }
+
+            .music-toggle { width: 48px; height: 48px; font-size: 1.3rem; bottom: 15px; right: 15px; }
+        }
+        @media (max-width: 400px) {
+            .content h1 { font-size: 1.45rem; }
+            .detail { font-size: 0.65rem; }
+            .info-card h2, .church-photo h2 { font-size: 0.85rem; }
+            .info-card { padding: 0.7rem 0.55rem; }
+            .church-photo { padding: 0.7rem 0.55rem; }
+            .map-link { font-size: 0.62rem; padding: 6px 6px; }
+            .church-img-placeholder { min-height: 0; }
+        }
+
+        /* ===== Keyframes ===== */
+        @keyframes magicalReveal {
+            0%   { opacity: 0; transform: scale(0.94); filter: blur(12px); }
+            60%  { opacity: 0.9; filter: blur(2px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+        @keyframes glitterFall {
+            0% { transform: translateY(-100px) rotate(0deg) scale(0); opacity: 0; }
+            10% { opacity: 1; transform: translateY(0) rotate(36deg) scale(1); }
+            100% { transform: translateY(100vh) rotate(720deg) scale(0.5); opacity: 0; }
+        }
+        @keyframes magicalIn {
+            from { transform: scale(0.5) rotate(-10deg); opacity: 0; filter: blur(10px); }
+            to   { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0); }
+        }
+        @keyframes sparkle {
+            0%, 100% { box-shadow: 0 0 60px rgba(138,43,226,0.6), 0 0 120px rgba(255,105,180,0.3); }
+            50% { box-shadow: 0 0 80px rgba(255,105,180,0.8), 0 0 150px rgba(138,43,226,0.5), 0 0 200px rgba(255,255,255,0.2); }
+        }
+        @keyframes morphIn {
+            0%   { transform: scale(0.8) rotateY(90deg); filter: blur(20px) brightness(2); opacity: 0; }
+            50%  { transform: scale(1.1) rotateY(0deg); filter: blur(5px) brightness(1.5); opacity: 0.8; }
+            100% { transform: scale(1) rotateY(0deg); filter: blur(0) brightness(1); opacity: 1; }
+        }
+        @keyframes photoOut {
+            from { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0) brightness(1); }
+            to   { transform: scale(0.55) rotate(12deg) translateY(-24px); opacity: 0; filter: blur(16px) brightness(1.9); }
+        }
+        @keyframes haloSpin {
+            0%   { transform: rotate(0deg) scale(0.92); }
+            100% { transform: rotate(360deg) scale(1.1); }
+        }
+        @keyframes shimmer-sweep { to { transform: rotate(360deg); } }
+        @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(138, 43, 226, 0.6), 0 0 30px rgba(255, 105, 180, 0.4); }
+            50%      { box-shadow: 0 4px 25px rgba(138, 43, 226, 0.9), 0 0 50px rgba(255, 105, 180, 0.7); }
+        }
+    </style>
+</head>
+<body>
+    <img id="bg-img" alt="Background" />
+    <div class="tour-progress" id="tour-progress"></div>
+
+    <div class="overlay">
+        <nav class="navbar" id="navbar">
+            <a href="#" id="nav-home" data-section="home" style="display:none;">🏠 Home</a>
+            <a href="#" data-section="venue"      data-nav-sound="heroVenue">📍 Venue</a>
+            <a href="#" data-section="gallery"    data-nav-sound="heroGodparents">📸 Photo Album</a>
+            <a href="#" data-section="godparents" data-nav-sound="heroGodparents">💖 God Parents</a>
+            <a href="#" data-section="gifts"      data-nav-sound="heroGifts">🎁 Gift Ideas</a>
+            <a href="#" data-section="dresscode"  data-nav-sound="heroDresscode">👗 Dress Code</a>
+        </nav>
+
+        <!-- HOME -->
+        <section class="section active" id="home">
+            <div class="content">
+                <h1>🎉 Azrianna Bia's Birthday 🎂</h1>
+                <p>You're invited to celebrate this special day!</p>
+                <button class="btn" id="view-invite-btn">View Invitation</button>
+            </div>
+        </section>
+
+        <!-- VENUE -->
+        <section class="section" id="venue">
+            <div class="content">
+                <h1>📍 Venue & Details</h1>
+                <p>Where the celebration happens</p>
+
+                <div class="container">
+                    <div class="left-panel">
+                        <div class="info-card">
+                            <h2>🕊️ Ceremony</h2>
+                            <div class="detail">📅 <span id="event-date"></span></div>
+                            <div class="detail">🕐 <span id="event-time"></span></div>
+                            <div class="detail">⛪ <span id="event-location"></span></div>
+                            <div class="detail">📌 <span id="event-location-address"></span></div>
+                            <a href="#" id="church-map-link" class="map-link" target="_blank" rel="noopener" data-sound="buttonClick">🗺️ View on Google Maps</a>
+                        </div>
+                        <div class="church-photo">
+                            <h2>⛪ Church</h2>
+                            <div class="church-img-placeholder" id="church-image-container">
+                                <span class="loading-text">Loading image...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-panel">
+                        <div class="info-card">
+                            <h2>🍟 Reception at McDonald's 🍔</h2>
+                            <div class="detail">🏛️ <span id="reception-venue"></span></div>
+                            <div class="detail">🏢 <span id="reception-branch"></span></div>
+                            <div class="detail">📍 <span id="reception-address"></span></div>
+                            <div class="detail">🕐 <span id="reception-time"></span></div>
+                            <a href="#" id="reception-map-link" class="map-link" target="_blank" rel="noopener" data-sound="buttonClick">🗺️ View on Google Maps</a>
+                        </div>
+                        <div class="church-photo">
+                            <h2>🍟 McDo Venue</h2>
+                            <div class="church-img-placeholder" id="mcdo-image-container">
+                                <span class="loading-text">Loading image...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHOTO ALBUM -->
+        <section class="section" id="gallery">
+            <div class="content">
+                <h1>📸 Photo Album</h1>
+                <p>Precious moments & memories</p>
+
+                <div class="carousel-wrap">
+                    <div class="carousel-stage" id="carousel-stage"></div>
+                    <div class="carousel-arrow carousel-prev" id="carousel-prev" title="Previous photo">&#10094;</div>
+                    <div class="carousel-arrow carousel-next" id="carousel-next" title="Next photo">&#10095;</div>
+                </div>
+                <div class="carousel-dots" id="carousel-dots"></div>
+                <div class="carousel-counter" id="carousel-counter">1 / 12</div>
+            </div>
+        </section>
+
+        <!-- GOD PARENTS -->
+        <section class="section" id="godparents">
+            <div class="content">
+                <h1>💖 God Parents</h1>
+                <p>Our beloved Ninongs and Ninangs</p>
+
+                <div class="godparents-container">
+                    <div class="godparents-section">
+                        <h2>👔 Ninongs</h2>
+                        <ul class="godparents-list" id="ninongs-list"></ul>
+                    </div>
+                    <div class="godparents-section">
+                        <h2>👗 Ninangs</h2>
+                        <ul class="godparents-list" id="ninangs-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GIFTS -->
+        <section class="section" id="gifts">
+            <div class="content">
+                <h1>🎁 Gift Ideas</h1>
+
+                <div class="message-card-large">
+                    <p class="message-text" id="gift-message"></p>
+                    <p class="message-note gift-note-color" id="gift-note"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DRESS CODE -->
+        <section class="section" id="dresscode">
+            <div class="content">
+                <h1>👗 Dress Code</h1>
+
+                <div class="message-card-large">
+                    <p class="message-text" id="dresscode-message"></p>
+                    <p class="message-note" id="dresscode-note"></p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <span class="lightbox-close" id="lightbox-close" data-sound="close">&times;</span>
+            <span class="lightbox-nav lightbox-prev" id="lightbox-prev" data-sound="buttonClick">&#10094;</span>
+            <img id="lightbox-img" src="" alt="Gallery image" />
+            <span class="lightbox-nav lightbox-next" id="lightbox-next" data-sound="buttonClick">&#10095;</span>
+        </div>
+    </div>
+
+    <div class="glitter-container" id="glitter-container"></div>
+
+    <button id="music-toggle" class="music-toggle muted" data-sound="musicToggle" title="Toggle Music" aria-label="Toggle background music">
+        <span id="music-icon">🔇</span>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+
+    <script>
+        // ============================================================
+        // SUPABASE
+        // ============================================================
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function getPublicUrl(path) {
+            const { data } = supabaseClient.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
+            return data.publicUrl;
+        }
+
+        // ============================================================
+        // AUDIO MANAGER
+        // ============================================================
+        const AudioManager = {
+            background: null,
+            sounds: {},
+            durations: {},
+            isMuted: false,
+            fadeTimer: null,
+            currentButton: null,
+            lastPlayedKey: null,
+
+            initBackground() {
+                this.background = new Audio();
+                this.background.src = getPublicUrl(AUDIO.background);
+                this.background.loop = AUDIO_SETTINGS.background.loop;
+                this.background.volume = AUDIO_SETTINGS.background.volume;
+                this.background.preload = 'auto';
+                this.background.crossOrigin = 'anonymous';
+
+                this.background.addEventListener('play', () => {
+                    this.isMuted = false;
+                    const btn = document.getElementById('music-toggle');
+                    const icon = document.getElementById('music-icon');
+                    if (btn) { btn.classList.add('playing'); btn.classList.remove('muted'); }
+                    if (icon) icon.textContent = '🔊';
+                });
+                this.background.addEventListener('pause', () => {
+                    this.isMuted = true;
+                    const btn = document.getElementById('music-toggle');
+                    const icon = document.getElementById('music-icon');
+                    if (btn) { btn.classList.remove('playing'); btn.classList.add('muted'); }
+                    if (icon) icon.textContent = '🔇';
+                });
+            },
+
+            preloadSounds() {
+                Object.keys(AUDIO).forEach(key => {
+                    if (key === 'background') return;
+                    const audio = new Audio();
+                    audio.src = getPublicUrl(AUDIO[key]);
+                    audio.preload = 'auto';
+                    audio.crossOrigin = 'anonymous';
+                    this.sounds[key] = audio;
+                });
+            },
+
+            async preloadAllDurations() {
+                const keys = Object.keys(this.sounds);
+                await Promise.all(keys.map(key => new Promise(resolve => {
+                    const a = this.sounds[key];
+                    if (a.readyState >= 1 && a.duration && isFinite(a.duration) && a.duration > 0) {
+                        this.durations[key] = a.duration;
+                        return resolve();
+                    }
+                    let done = false;
+                    const finish = () => {
+                        if (done) return; done = true;
+                        const d = (isFinite(a.duration) && a.duration > 0) ? a.duration : 0;
+                        this.durations[key] = d;
+                        resolve();
+                    };
+                    a.addEventListener('loadedmetadata', finish, { once: true });
+                    a.addEventListener('error', finish, { once: true });
+                    try { a.load(); } catch (e) {}
+                    setTimeout(finish, 15000);
+                })));
+            },
+
+            playBackgroundNow() {
+                if (!this.background) return;
+                if (this.background.paused) {
+                    this.background.volume = AUDIO_SETTINGS.background.volume;
+                    this.background.play().catch(err => {
+                        console.warn('[Audio] Background play failed:', err);
+                    });
+                }
+            },
+
+            toggleBackground() {
+                if (!this.background) return;
+                if (this.background.paused) this.background.play().catch(() => {});
+                else this.background.pause();
+            },
+
+            stopCurrentButtonSound() {
+                if (!this.currentButton) return;
+                try {
+                    this.currentButton.pause();
+                    this.currentButton.currentTime = 0;
+                } catch (e) {}
+                this.currentButton = null;
+                this.lastPlayedKey = null;
+                if (AUDIO_SETTINGS.ducking.enabled && this.background && !this.background.paused) {
+                    this.duckUp();
+                }
+            },
+
+            isButtonSoundPlaying() {
+                return !!this.currentButton && !this.currentButton.paused && !this.currentButton.ended;
+            },
+
+            getCurrentButtonRemainingMs() {
+                const p = this.currentButton;
+                if (!p) return 0;
+                if (p.paused || p.ended) return 0;
+                const dur = p.duration;
+                if (!isFinite(dur) || dur <= 0) return 0;
+                return Math.max(0, (dur - p.currentTime) * 1000);
+            },
+
+            waitForButtonSound() {
+                if (!this.isButtonSoundPlaying()) return Promise.resolve();
+                return new Promise(resolve => {
+                    const p = this.currentButton;
+                    const done = () => resolve();
+                    p.addEventListener('ended', done, { once: true });
+                    p.addEventListener('error', done, { once: true });
+                });
+            },
+
+            playIfNotSamePlaying(soundKey, options = {}) {
+                if (!soundKey) soundKey = 'buttonClick';
+                if (this.lastPlayedKey === soundKey && this.isButtonSoundPlaying()) {
+                    return this.currentButton;
+                }
+                return this.playButton(soundKey, options);
+            },
+
+            playButton(soundKey, options = {}) {
+                if (!soundKey) soundKey = 'buttonClick';
+                const source = this.sounds[soundKey];
+                if (!source) {
+                    console.warn(`[Audio] Sound "${soundKey}" NOT LOADED`);
+                    if (typeof options.onEnded === 'function') setTimeout(() => options.onEnded(), 0);
+                    return null;
+                }
+                if (options.interrupt === true) this.stopCurrentButtonSound();
+                return this._startPlayer(source, soundKey, options);
+            },
+
+            _startPlayer(source, soundKey, options) {
+                const player = source.cloneNode();
+                player.volume = AUDIO_SETTINGS.buttons.volume;
+                player.crossOrigin = 'anonymous';
+                player.preload = 'auto';
+
+                this.currentButton = player;
+                this.lastPlayedKey = soundKey;
+
+                const bgPlaying = this.background && !this.background.paused;
+                if (AUDIO_SETTINGS.ducking.enabled && bgPlaying) this.duckDown();
+
+                let finished = false;
+                const finish = () => {
+                    if (finished) return; finished = true;
+                    if (this.currentButton === player) {
+                        this.currentButton = null;
+                        this.lastPlayedKey = null;
+                        if (AUDIO_SETTINGS.ducking.enabled) this.duckUp();
+                    }
+                    if (typeof options.onEnded === 'function') options.onEnded();
+                };
+                player.addEventListener('ended', finish, { once: true });
+                player.addEventListener('error', finish, { once: true });
+
+                player.play().catch(err => {
+                    console.warn(`Button sound "${soundKey}" failed:`, err.message);
+                    finish();
+                });
+
+                return player;
+            },
+
+            fadeVolume(to, duration) {
+                if (!this.background) return;
+                if (this.fadeTimer) clearInterval(this.fadeTimer);
+                const steps = 20;
+                const stepTime = Math.max(10, duration / steps);
+                const start = this.background.volume;
+                const delta = (to - start) / steps;
+                let i = 0;
+                this.fadeTimer = setInterval(() => {
+                    i++;
+                    const v = start + delta * i;
+                    this.background.volume = Math.max(0, Math.min(1, v));
+                    if (i >= steps) {
+                        clearInterval(this.fadeTimer);
+                        this.fadeTimer = null;
+                        this.background.volume = to;
+                    }
+                }, stepTime);
+            },
+
+            duckDown() { this.fadeVolume(AUDIO_SETTINGS.ducking.volume, AUDIO_SETTINGS.ducking.fadeOut); },
+            duckUp()   { this.fadeVolume(AUDIO_SETTINGS.background.volume, AUDIO_SETTINGS.ducking.fadeIn); }
+        };
+
+        // ============================================================
+        // SOUND DELEGATION
+        // ============================================================
+        function installSoundDelegation() {
+            document.addEventListener('click', (e) => {
+                const el = e.target.closest('[data-sound]');
+                if (!el) return;
+                if (el.closest('.navbar')) return;
+                AudioManager.playButton(el.dataset.sound);
+            }, true);
+        }
+
+        // ============================================================
+        // CAROUSEL
+        // ============================================================
+        const Carousel = {
+            index: 0, slides: [],
+            dotsEl: null, counterEl: null, stageEl: null,
+            timer: null, seconds: 3, running: false,
+
+            init() {
+                this.stageEl   = document.getElementById('carousel-stage');
+                this.dotsEl    = document.getElementById('carousel-dots');
+                this.counterEl = document.getElementById('carousel-counter');
+            },
+            build(imageUrls) {
+                this.stageEl.innerHTML = '';
+                this.dotsEl.innerHTML = '';
+                this.slides = [];
+                imageUrls.forEach((url, i) => {
+                    const slide = document.createElement('div');
+                    slide.className = 'carousel-slide';
+                    slide.dataset.index = i;
+                    const img = document.createElement('img');
+                    img.src = url; img.alt = `Gallery photo ${i + 1}`;
+                    img.loading = 'lazy';
+                    img.onerror = () => { slide.innerHTML = '<span class="placeholder-text">Image unavailable</span>'; };
+                    slide.appendChild(img);
+                    slide.addEventListener('click', () => openLightbox(i));
+                    this.stageEl.appendChild(slide);
+                    this.slides.push(slide);
+
+                    const dot = document.createElement('div');
+                    dot.className = 'dot'; dot.dataset.index = i;
+                    dot.title = `Photo ${i + 1}`;
+                    dot.addEventListener('click', () => this.goTo(i));
+                    this.dotsEl.appendChild(dot);
+                });
+                this.goTo(0);
+                this.updateCounter();
+            },
+            showSlide(i) {
+                this.slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+                this.dotsEl.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
+                this.updateCounter();
+            },
+            updateCounter() {
+                if (!this.counterEl) return;
+                this.counterEl.textContent = `${this.index + 1} / ${this.slides.length}`;
+            },
+            goTo(i) {
+                if (this.slides.length === 0) return;
+                this.index = ((i % this.slides.length) + this.slides.length) % this.slides.length;
+                this.showSlide(this.index);
+            },
+            start() {
+                this.stop();
+                if (this.slides.length <= 1) return;
+                this.running = true;
+                const loop = () => {
+                    if (!this.running) return;
+                    this.timer = setTimeout(() => {
+                        if (!this.running) return;
+                        this.goTo(this.index + 1);
+                        loop();
+                    }, this.seconds * 1000);
+                };
+                loop();
+            },
+            stop() {
+                this.running = false;
+                if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+            }
+        };
+
+        // ============================================================
+        // UI REVEAL / HIDE
+        // ============================================================
+        let uiRevealed = false;
+
+        function revealUI() {
+            if (uiRevealed) return;
+            uiRevealed = true;
+            document.getElementById('navbar').classList.add('visible');
+        }
+
+        function hideUI() {
+            uiRevealed = false;
+            document.getElementById('navbar').classList.remove('visible');
+        }
+
+        // ============================================================
+        // AUTO TOUR
+        // ============================================================
+        const AutoTour = {
+            sequence: ['venue', 'gallery', 'godparents', 'gifts', 'dresscode'],
+            soundFor: {
+                venue:      'heroVenue',
+                gallery:    'heroGodparents',
+                godparents: 'heroGodparents',
+                gifts:      'heroGifts',
+                dresscode:  'heroDresscode'
+            },
+
+            defaultNoSoundSeconds: 5,
+            pauseAfterSound: 1000,
+            maxSoundSeconds: 180,
+
+            currentIndex: 0,
+            running: false,
+            generation: 0,
+            advanceTimer: null,
+            pauseTimer: null,
+            progressEl: null,
+            sectionsVisited: new Set(),
+
+            init() { this.progressEl = document.getElementById('tour-progress'); },
+
+            async start() {
+                if (this.running) return;
+                await AudioManager.waitForButtonSound();
+                if (Object.keys(AudioManager.durations).length === 0) {
+                    await AudioManager.preloadAllDurations();
+                }
+                if (this.running) return;
+                this.running = true;
+                this.currentIndex = 0;
+                this.sectionsVisited = new Set();
+                this.enterCurrentSection();
+            },
+
+            stop() {
+                this.running = false;
+                this.generation++;
+                if (this.advanceTimer) { clearTimeout(this.advanceTimer); this.advanceTimer = null; }
+                if (this.pauseTimer)  { clearTimeout(this.pauseTimer);  this.pauseTimer  = null; }
+                Carousel.stop();
+                this.resetProgress();
+            },
+
+            enterCurrentSection() {
+                if (!this.running) return;
+
+                const myGen = ++this.generation;
+                const sectionId = this.sequence[this.currentIndex];
+                const snd = this.soundFor[sectionId];
+
+                showSection(sectionId);
+                this.sectionsVisited.add(sectionId);
+
+                const required = ['venue', 'gallery', 'godparents', 'gifts', 'dresscode'];
+                const allVisited = required.every(s => this.sectionsVisited.has(s));
+
+                if (sectionId === 'venue' && allVisited) {
+                    revealUI();
+                    Carousel.stop();
+                    if (snd) AudioManager.playButton(snd, { interrupt: true });
+                    this.running = false;
+                    this.resetProgress();
+                    return;
+                }
+
+                if (sectionId === 'gallery') Carousel.start();
+                else Carousel.stop();
+
+                const soundDuration = snd ? (AudioManager.durations[snd] || 0) : 0;
+                const photoCount = Carousel.slides.length || 1;
+                const carouselMs = photoCount * Carousel.seconds * 1000;
+
+                let waitMs;
+                if (sectionId === 'gallery') {
+                    waitMs = carouselMs;
+                } else if (sectionId === 'godparents') {
+                    const remaining = AudioManager.getCurrentButtonRemainingMs();
+                    if (remaining > 0) waitMs = remaining;
+                    else waitMs = this.defaultNoSoundSeconds * 1000;
+                } else if (soundDuration > 0) {
+                    waitMs = Math.min(soundDuration, this.maxSoundSeconds) * 1000;
+                } else {
+                    waitMs = this.defaultNoSoundSeconds * 1000;
+                }
+
+                if (!this.running || myGen !== this.generation) return;
+
+                if (sectionId === 'gallery') {
+                    AudioManager.playButton('heroGodparents', { interrupt: true });
+                } else if (sectionId !== 'godparents') {
+                    if (snd) AudioManager.playButton(snd, { interrupt: true });
+                }
+
+                this.animateProgress(waitMs + this.pauseAfterSound);
+
+                this.advanceTimer = setTimeout(() => {
+                    if (myGen !== this.generation) return;
+                    if (!this.running) return;
+
+                    this.pauseTimer = setTimeout(() => {
+                        if (myGen !== this.generation) return;
+                        if (!this.running) return;
+
+                        this.currentIndex = (this.currentIndex + 1) % this.sequence.length;
+                        this.enterCurrentSection();
+                    }, this.pauseAfterSound);
+                }, waitMs);
+            },
+
+            animateProgress(durationMs) {
+                if (!this.progressEl) return;
+                const bar = this.progressEl;
+                bar.classList.add('active');
+                bar.style.transition = 'none';
+                bar.style.width = '0%';
+                void bar.offsetWidth;
+                bar.style.transition = `width ${durationMs}ms linear`;
+                bar.style.width = '100%';
+            },
+
+            resetProgress() {
+                if (!this.progressEl) return;
+                const bar = this.progressEl;
+                bar.style.transition = 'none';
+                bar.style.width = '0%';
+                bar.classList.remove('active');
+            }
+        };
+
+        // ============================================================
+        // MANUAL NAVIGATION
+        // ============================================================
+        function navigateTo(sectionId, soundKey) {
+            AutoTour.stop();
+            showSection(sectionId);
+
+            if (soundKey) {
+                AudioManager.playIfNotSamePlaying(soundKey, { interrupt: true });
+            }
+
+            if (sectionId === 'gallery') {
+                Carousel.goTo(0);
+                Carousel.start();
+            } else {
+                Carousel.stop();
+            }
+        }
+
+        document.querySelectorAll('.navbar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateTo(link.dataset.section, link.dataset.navSound || link.dataset.sound);
+            });
+        });
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        let galleryImages = [];
+        let currentImageIndex = 0;
+
+        // ============================================================
+        // IMAGES
+        // ============================================================
+        function loadBackgroundImage() {
+            const bgImg = document.getElementById('bg-img');
+            bgImg.src = getPublicUrl(PHOTOS.background);
+            bgImg.onload = () => bgImg.classList.add('loaded');
+            bgImg.onerror = () => { bgImg.style.display = 'none'; };
+        }
+
+        function loadSingleImage(containerId, path, altText, fallbackText) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const img = document.createElement('img');
+            img.src = getPublicUrl(path);
+            img.alt = altText;
+            img.onload = () => {
+                container.innerHTML = '';
+                container.appendChild(img);
+            };
+            img.onerror = () => {
+                container.innerHTML = `<span class="loading-text">${fallbackText}</span>`;
+            };
+        }
+
+        function loadGallery() {
+            galleryImages = PHOTOS.gallery.map(path => getPublicUrl(path));
+            Carousel.build(galleryImages);
+        }
+
+        // ============================================================
+        // LIGHTBOX
+        // ============================================================
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(index) {
+            Carousel.stop();
+            currentImageIndex = index;
+            lightboxImg.src = galleryImages[index];
+            lightboxImg.classList.remove('magical', 'transitioning');
+            void lightboxImg.offsetWidth;
+            lightboxImg.classList.add('magical');
+            lightbox.classList.add('active');
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            if (document.getElementById('gallery').classList.contains('active')) {
+                Carousel.start();
+            }
+        }
+
+        function navigateLightbox(direction) {
+            lightboxImg.classList.add('transitioning');
+            setTimeout(() => {
+                currentImageIndex = (currentImageIndex + direction + galleryImages.length) % galleryImages.length;
+                lightboxImg.src = galleryImages[currentImageIndex];
+                lightboxImg.classList.remove('transitioning');
+                void lightboxImg.offsetWidth;
+                lightboxImg.classList.add('magical');
+            }, 400);
+        }
+
+        document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+        document.getElementById('lightbox-prev').addEventListener('click', () => navigateLightbox(-1));
+        document.getElementById('lightbox-next').addEventListener('click', () => navigateLightbox(1));
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') navigateLightbox(-1);
+            if (e.key === 'ArrowRight') navigateLightbox(1);
+        });
+
+        // ============================================================
+        // SECTION SWITCHER
+        // ============================================================
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(sectionId);
+            if (target) target.classList.add('active');
+            document.querySelectorAll('.navbar a').forEach(a => {
+                a.classList.toggle('active', a.dataset.section === sectionId);
+            });
+            window.scrollTo(0, 0);
+        }
+
+        // ============================================================
+        // START BUTTON (View Invitation)
+        // ============================================================
+        document.getElementById('view-invite-btn').addEventListener('click', () => {
+            AudioManager.playBackgroundNow();
+
+            const navHome = document.getElementById('nav-home');
+            if (navHome) navHome.style.display = 'none';
+
+            hideUI();
+            AutoTour.start();
+        });
+
+        // ============================================================
+        // MUSIC TOGGLE + CAROUSEL ARROWS
+        // ============================================================
+        document.getElementById('music-toggle').addEventListener('click', () => {
+            AudioManager.toggleBackground();
+        });
+
+        document.getElementById('carousel-prev').addEventListener('click', () => {
+            Carousel.goTo(Carousel.index - 1);
+            if (document.getElementById('gallery').classList.contains('active')) Carousel.start();
+        });
+        document.getElementById('carousel-next').addEventListener('click', () => {
+            Carousel.goTo(Carousel.index + 1);
+            if (document.getElementById('gallery').classList.contains('active')) Carousel.start();
+        });
+
+        // ============================================================
+        // POPULATE CONTENT
+        // ============================================================
+        function populateGodparents() {
+            const ninongsList = document.getElementById('ninongs-list');
+            const ninangsList = document.getElementById('ninangs-list');
+            ninongsList.innerHTML = '';
+            ninangsList.innerHTML = '';
+            EVENT_DATA.ninongs.forEach(name => {
+                const li = document.createElement('li');
+                li.textContent = name;
+                ninongsList.appendChild(li);
+            });
+            EVENT_DATA.ninangs.forEach(name => {
+                const li = document.createElement('li');
+                li.textContent = name;
+                ninangsList.appendChild(li);
+            });
+        }
+
+        function populateGiftIdeas() {
+            document.getElementById('gift-message').textContent = EVENT_DATA.giftMessage;
+            document.getElementById('gift-note').textContent = EVENT_DATA.giftNote;
+        }
+
+        function populateDressCode() {
+            document.getElementById('dresscode-message').textContent = EVENT_DATA.dressCodeMessage;
+            document.getElementById('dresscode-note').textContent = EVENT_DATA.dressCodeNote;
+        }
+
+        function populateVenueInfo() {
+            document.getElementById('event-date').textContent = EVENT_DATA.date;
+            document.getElementById('event-time').textContent = EVENT_DATA.time;
+            document.getElementById('event-location').textContent = EVENT_DATA.location;
+            document.getElementById('event-location-address').textContent = EVENT_DATA.locationAddress;
+
+            const churchMapLink = document.getElementById('church-map-link');
+            if (EVENT_DATA.locationMapUrl) churchMapLink.href = EVENT_DATA.locationMapUrl;
+            else churchMapLink.style.display = 'none';
+
+            document.getElementById('reception-venue').textContent = EVENT_DATA.receptionVenue;
+            document.getElementById('reception-branch').textContent = EVENT_DATA.receptionBranch;
+            document.getElementById('reception-address').textContent = EVENT_DATA.receptionAddress;
+            document.getElementById('reception-time').textContent = EVENT_DATA.receptionTime;
+
+            const mapLink = document.getElementById('reception-map-link');
+            if (EVENT_DATA.receptionMapUrl) mapLink.href = EVENT_DATA.receptionMapUrl;
+            else mapLink.style.display = 'none';
+        }
+
+        function createGlitter() {
+            const container = document.getElementById('glitter-container');
+            for (let i = 0; i < 40; i++) {
+                const g = document.createElement('div');
+                g.className = 'glitter';
+                g.style.left = Math.random() * 100 + '%';
+                g.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                g.style.animationDelay = (Math.random() * 5) + 's';
+                const size = (Math.random() * 8 + 4) + 'px';
+                g.style.width = size;
+                g.style.height = size;
+                container.appendChild(g);
+            }
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            AudioManager.initBackground();
+            AudioManager.preloadSounds();
+            installSoundDelegation();
+
+            AutoTour.init();
+            Carousel.init();
+
+            populateGodparents();
+            populateGiftIdeas();
+            populateDressCode();
+            populateVenueInfo();
+
+            loadBackgroundImage();
+            loadSingleImage('church-image-container', PHOTOS.church, 'Church', 'Church image unavailable');
+            loadSingleImage('mcdo-image-container', PHOTOS.mcdo, "McDonald's", "🍟 McDo Party!");
+            loadGallery();
+            createGlitter();
+
+            AudioManager.preloadAllDurations();
+        });
+    </script>
+</body>
+</html>
