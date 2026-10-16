@@ -70,9 +70,9 @@ const EVENT_DATA = {
         'Ruby Mae Caisip'
     ],
 
-    dressCodeMessage: 'Come as you are! Any comfortable outfit is perfectly fine. Just wear something you feel great in — we want you to enjoy the celebration without any fuss.',
+    dressCodeMessage: 'Wear whatever you like and come as you are! There's no fancy dress code—just dress comfortably, bring your happy vibes, and celebrate with us!',
     dressCodeNote: '👕 Casual • 👗 Semi-Formal • 😎 Any Color — your comfort is what matters most!',
 
-    giftMessage: 'Your presence is the greatest gift we could ever ask for. No need to bring anything — your love and blessings are more than enough.',
-    giftNote: 'But if you truly wish to give, any gift from the heart is deeply appreciated. 💝'
+    giftMessage: 'Your love, prayers, and presence mean so much to me and are already the sweetest gifts I could ever ask for. But if you're thinking of giving me a little something, anything chosen with love would be warmly appreciated and treasured. Most of all, I'm simply grateful to celebrate this special day surrounded by the people who make my world brighter.',
+    giftNote: 'But if you're thinking of giving me a little something, anything chosen with love would be warmly appreciated and treasured. 💝'
 };
