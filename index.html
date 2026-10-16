@@ -223,6 +223,20 @@
         .carousel-slide img {
             width: 100%; height: 100%;
             object-fit: cover; border-radius: 20px;
+            /* ★ Picture animation */
+            transition: transform 0.3s ease, filter 0.3s ease;
+            cursor: pointer;
+        }
+        /* ★ Scale-down pag pinindot */
+        .carousel-slide img:active {
+            transform: scale(0.97);
+            filter: brightness(1.15);
+        }
+        /* ★ Scale-up pag clinick */
+        .carousel-slide img.clicking {
+            transform: scale(1.08);
+            filter: brightness(1.3);
+            transition: transform 0.25s ease, filter 0.25s ease;
         }
         .carousel-slide .placeholder-text {
             color: rgba(255,255,255,0.75); font-size: 1rem;
@@ -412,7 +426,6 @@
             .content > p { font-size: 0.95rem; margin-bottom: 0.8rem; }
             .btn { padding: 13px 32px; font-size: 1rem; }
 
-            /* ===== VENUE MOBILE LAYOUT ===== */
             .container { 
                 padding: 0.8rem; 
                 gap: 1rem;
@@ -937,7 +950,14 @@
                     img.loading = 'lazy';
                     img.onerror = () => { slide.innerHTML = '<span class="placeholder-text">Image unavailable</span>'; };
                     slide.appendChild(img);
-                    slide.addEventListener('click', () => openLightbox(i));
+                    /* Click transition — scale up bago mag-lightbox */
+                    slide.addEventListener('click', () => {
+                        img.classList.add('clicking');
+                        setTimeout(() => {
+                            img.classList.remove('clicking');
+                            openLightbox(i);
+                        }, 250);
+                    });
                     this.stageEl.appendChild(slide);
                     this.slides.push(slide);
 
@@ -1166,6 +1186,8 @@
         // ============================================================
         let galleryImages = [];
         let currentImageIndex = 0;
+        let lightboxTimer = null;
+        const LIGHTBOX_INTERVAL_MS = 3000;  // 3 seconds per photo
 
         // ============================================================
         // IMAGES
@@ -1211,9 +1233,15 @@
             void lightboxImg.offsetWidth;
             lightboxImg.classList.add('magical');
             lightbox.classList.add('active');
+
+            // ★ Start auto-advance sa lightbox (movie slideshow)
+            startLightboxAutoAdvance();
         }
 
         function closeLightbox() {
+            // ★ Stop auto-advance
+            stopLightboxAutoAdvance();
+
             lightbox.classList.remove('active');
             if (document.getElementById('gallery').classList.contains('active')) {
                 Carousel.start();
@@ -1221,6 +1249,12 @@
         }
 
         function navigateLightbox(direction) {
+            // ★ I-reset yung timer kada manual navigation
+            //   Para pag pinindot mo yung arrow, mag-restart yung 3s countdown
+            if (direction !== 0) {
+                startLightboxAutoAdvance();
+            }
+
             lightboxImg.classList.add('transitioning');
             setTimeout(() => {
                 currentImageIndex = (currentImageIndex + direction + galleryImages.length) % galleryImages.length;
@@ -1229,6 +1263,21 @@
                 void lightboxImg.offsetWidth;
                 lightboxImg.classList.add('magical');
             }, 400);
+        }
+
+        // ★ Auto-advance sa lightbox (movie slideshow)
+        function startLightboxAutoAdvance() {
+            stopLightboxAutoAdvance();
+            lightboxTimer = setInterval(() => {
+                navigateLightbox(1);  // next photo
+            }, LIGHTBOX_INTERVAL_MS);
+        }
+
+        function stopLightboxAutoAdvance() {
+            if (lightboxTimer) {
+                clearInterval(lightboxTimer);
+                lightboxTimer = null;
+            }
         }
 
         document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
