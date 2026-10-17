@@ -6,12 +6,14 @@
     <title>Azrianna Bia - Birthday Invitation</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             min-height: 100vh;
             background: radial-gradient(circle at center, #ffd9ec 0%, #c9a7e8 55%, #9b6fd0 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
         }
+
         #bg-img {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
@@ -50,17 +52,11 @@
             transform: translateY(-2px);
         }
 
-        /* ===== Sections with magical reveal ===== */
+        /* ===== Sections ===== */
         .section { display: none; min-height: 100vh; }
         .section.active {
             display: block;
             animation: magicalReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        @keyframes magicalReveal {
-            0%   { opacity: 0; transform: scale(0.94); filter: blur(12px); }
-            60%  { opacity: 0.9; filter: blur(2px); }
-            100% { opacity: 1; transform: scale(1); filter: blur(0); }
         }
 
         .content { text-align: center; color: white; padding: 2rem; }
@@ -134,6 +130,7 @@
             word-break: break-word; overflow-wrap: anywhere;
         }
         .detail span { flex: 1; min-width: 0; word-break: break-word; overflow-wrap: anywhere; }
+
         .church-img-placeholder {
             width: 100%; height: 360px;
             background: rgba(255,255,255,0.2);
@@ -150,7 +147,6 @@
             color: rgba(255,255,255,0.7); font-size: 0.9rem;
         }
 
-        /* Shared map link style */
         .map-link {
             display: inline-block;
             margin-top: 0.8rem; padding: 10px 22px;
@@ -385,6 +381,7 @@
             background: radial-gradient(circle, rgba(255,215,0,1) 0%, rgba(255,105,180,0.8) 50%, transparent 100%);
             border-radius: 50%;
             animation: glitterFall linear infinite; opacity: 0;
+            will-change: transform, opacity;
         }
         .music-toggle {
             position: fixed; bottom: 25px; right: 25px;
@@ -423,26 +420,26 @@
             .content > p { font-size: 0.95rem; margin-bottom: 0.8rem; }
             .btn { padding: 13px 32px; font-size: 1rem; }
 
-            .container { 
-                padding: 0.8rem; 
+            .container {
+                padding: 0.8rem;
                 gap: 1rem;
                 flex-direction: column;
             }
-            .left-panel, .right-panel { 
-                flex: 1 1 100%; 
-                gap: 0.8rem; 
+            .left-panel, .right-panel {
+                flex: 1 1 100%;
+                gap: 0.8rem;
                 padding: 0;
                 flex-direction: row;
                 flex-wrap: nowrap;
                 align-items: stretch;
             }
-            .info-card { 
+            .info-card {
                 flex: 0 0 60%;
                 min-width: 0;
                 padding: 0.9rem 0.7rem;
                 border-radius: 14px;
             }
-            .church-photo { 
+            .church-photo {
                 flex: 0 0 calc(40% - 0.8rem);
                 min-width: 0;
                 padding: 0.9rem 0.7rem;
@@ -450,21 +447,21 @@
                 display: flex;
                 flex-direction: column;
             }
-            .info-card h2, .church-photo h2 { 
-                font-size: 0.95rem; 
+            .info-card h2, .church-photo h2 {
+                font-size: 0.95rem;
                 margin-bottom: 0.5rem;
                 padding-bottom: 0.35rem;
                 line-height: 1.2;
             }
-            .detail { 
-                font-size: 0.72rem; 
-                gap: 0.35rem; 
+            .detail {
+                font-size: 0.72rem;
+                gap: 0.35rem;
                 margin-bottom: 0.45rem;
                 line-height: 1.3;
             }
-            .church-img-placeholder { 
-                height: auto; 
-                flex: 1; 
+            .church-img-placeholder {
+                height: auto;
+                flex: 1;
                 min-height: 0;
                 aspect-ratio: 1 / 1;
                 border-radius: 10px;
@@ -478,9 +475,9 @@
                 padding: 0 0.3rem;
             }
             .map-link {
-                display: block; 
-                width: 100%; 
-                padding: 7px 8px; 
+                display: block;
+                width: 100%;
+                padding: 7px 8px;
                 font-size: 0.68rem;
                 margin-top: 0.5rem;
                 border-radius: 20px;
@@ -523,8 +520,8 @@
             100% { opacity: 1; transform: scale(1); filter: blur(0); }
         }
         @keyframes glitterFall {
-            0% { transform: translateY(-100px) rotate(0deg) scale(0); opacity: 0; }
-            10% { opacity: 1; transform: translateY(0) rotate(36deg) scale(1); }
+            0%   { transform: translateY(-100px) rotate(0deg) scale(0); opacity: 0; }
+            10%  { opacity: 1; transform: translateY(0) rotate(36deg) scale(1); }
             100% { transform: translateY(100vh) rotate(720deg) scale(0.5); opacity: 0; }
         }
         @keyframes magicalIn {
@@ -533,7 +530,7 @@
         }
         @keyframes sparkle {
             0%, 100% { box-shadow: 0 0 60px rgba(138,43,226,0.6), 0 0 120px rgba(255,105,180,0.3); }
-            50% { box-shadow: 0 0 80px rgba(255,105,180,0.8), 0 0 150px rgba(138,43,226,0.5), 0 0 200px rgba(255,255,255,0.2); }
+            50%      { box-shadow: 0 0 80px rgba(255,105,180,0.8), 0 0 150px rgba(138,43,226,0.5), 0 0 200px rgba(255,255,255,0.2); }
         }
         @keyframes morphIn {
             0%   { transform: scale(0.8) rotateY(90deg); filter: blur(20px) brightness(2); opacity: 0; }
@@ -561,7 +558,6 @@
 
     <div class="overlay">
         <nav class="navbar" id="navbar">
-            <a href="#" id="nav-home" data-section="home" style="display:none;">🏠 Home</a>
             <a href="#" data-section="venue"      data-nav-sound="heroVenue">📍 Venue</a>
             <a href="#" data-section="gallery"    data-nav-sound="heroGodparents">📸 Photo Album</a>
             <a href="#" data-section="godparents" data-nav-sound="heroGodparents">💖 God Parents</a>
@@ -701,6 +697,15 @@
 
     <script>
         // ============================================================
+        // GUARD: config.js must load before this script runs
+        // ============================================================
+        if (typeof EVENT_DATA === 'undefined' || typeof PHOTOS === 'undefined' || typeof AUDIO === 'undefined') {
+            console.error('[Init] config.js failed to load or is missing required globals.');
+            document.body.innerHTML = '<div style="color:white;padding:2rem;text-align:center;font-family:sans-serif;">⚠️ Configuration failed to load. Please refresh the page.</div>';
+            throw new Error('config.js missing');
+        }
+
+        // ============================================================
         // SUPABASE
         // ============================================================
         const { createClient } = supabase;
@@ -712,13 +717,20 @@
         }
 
         // ============================================================
-        // AUDIO MANAGER  (iOS-friendly)
+        // iOS DETECTION
+        // ============================================================
+        const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        // ============================================================
+        // AUDIO MANAGER (iOS-friendly)
         // ============================================================
         const AudioManager = {
             background: null,
             sounds: {},
             durations: {},
             isMuted: false,
+            isDucked: false,
             fadeTimer: null,
             currentButton: null,
             lastPlayedKey: null,
@@ -759,37 +771,34 @@
                 });
             },
 
-            // ★ iOS UNLOCK: i-play lahat ng audio sa loob ng user gesture
-            //   (muted/volume=0) para ma-unlock sila ng iOS Safari.
+            // iOS unlock — returns a Promise that resolves after all audios
+            // have been played-then-paused (or failed) inside the user gesture.
             unlockAllForIOS() {
-                if (this.iosUnlocked) return;
+                if (this.iosUnlocked) return Promise.resolve();
+                if (!IS_IOS) {
+                    this.iosUnlocked = true;
+                    return Promise.resolve();
+                }
                 this.iosUnlocked = true;
 
-                const allAudios = [
-                    this.background,
-                    ...Object.values(this.sounds)
-                ].filter(Boolean);
-
-                allAudios.forEach(a => {
+                const allAudios = [this.background, ...Object.values(this.sounds)].filter(Boolean);
+                const promises = allAudios.map(a => {
                     const origVol = a.volume;
                     a.volume = 0;
                     let p;
-                    try { p = a.play(); } catch (e) { a.volume = origVol; return; }
+                    try { p = a.play(); } catch (e) { a.volume = origVol; return Promise.resolve(); }
                     if (p && typeof p.then === 'function') {
-                        p.then(() => {
-                            // Successfully unlocked — i-pause at ibalik sa 0
-                            try {
-                                a.pause();
-                                a.currentTime = 0;
-                            } catch (e) {}
+                        return p.then(() => {
+                            try { a.pause(); a.currentTime = 0; } catch (e) {}
                             a.volume = origVol;
                         }).catch(() => {
                             a.volume = origVol;
                         });
-                    } else {
-                        a.volume = origVol;
                     }
+                    a.volume = origVol;
+                    return Promise.resolve();
                 });
+                return Promise.all(promises);
             },
 
             async preloadAllDurations() {
@@ -860,9 +869,18 @@
                 if (!this.isButtonSoundPlaying()) return Promise.resolve();
                 return new Promise(resolve => {
                     const p = this.currentButton;
-                    const done = () => resolve();
-                    p.addEventListener('ended', done, { once: true });
-                    p.addEventListener('error', done, { once: true });
+                    if (p.ended || p.paused) return resolve();
+                    let settled = false;
+                    const done = () => {
+                        if (settled) return; settled = true;
+                        p.removeEventListener('ended', done);
+                        p.removeEventListener('error', done);
+                        clearTimeout(safety);
+                        resolve();
+                    };
+                    const safety = setTimeout(done, 30000);
+                    p.addEventListener('ended', done);
+                    p.addEventListener('error', done);
                 });
             },
 
@@ -883,12 +901,15 @@
                     return null;
                 }
                 if (options.interrupt === true) this.stopCurrentButtonSound();
+
+                if (this.currentButton === source && !source.paused && !source.ended) {
+                    return source;
+                }
                 return this._startPlayer(source, soundKey, options);
             },
 
-            // ★ iOS-safe: HUWAG mag-clone. Gamitin ang original na audio element.
             _startPlayer(source, soundKey, options) {
-                const player = source;   // ← HUWAG cloneNode
+                const player = source;
 
                 try {
                     player.pause();
@@ -915,8 +936,8 @@
                     }
                     if (typeof options.onEnded === 'function') options.onEnded();
                 };
-                player.addEventListener('ended', finish, { once: true });
-                player.addEventListener('error', finish, { once: true });
+                player.addEventListener('ended', finish);
+                player.addEventListener('error', finish);
 
                 const p = player.play();
                 if (p && typeof p.catch === 'function') {
@@ -949,8 +970,15 @@
                 }, stepTime);
             },
 
-            duckDown() { this.fadeVolume(AUDIO_SETTINGS.ducking.volume, AUDIO_SETTINGS.ducking.fadeOut); },
-            duckUp()   { this.fadeVolume(AUDIO_SETTINGS.background.volume, AUDIO_SETTINGS.ducking.fadeIn); }
+            duckDown() {
+                this.isDucked = true;
+                this.fadeVolume(AUDIO_SETTINGS.ducking.volume, AUDIO_SETTINGS.ducking.fadeOut);
+            },
+            duckUp() {
+                if (!this.isDucked) return;
+                this.isDucked = false;
+                this.fadeVolume(AUDIO_SETTINGS.background.volume, AUDIO_SETTINGS.ducking.fadeIn);
+            }
         };
 
         // ============================================================
@@ -978,6 +1006,7 @@
                 this.dotsEl    = document.getElementById('carousel-dots');
                 this.counterEl = document.getElementById('carousel-counter');
             },
+
             build(imageUrls) {
                 this.stageEl.innerHTML = '';
                 this.dotsEl.innerHTML = '';
@@ -986,18 +1015,28 @@
                     const slide = document.createElement('div');
                     slide.className = 'carousel-slide';
                     slide.dataset.index = i;
+
                     const img = document.createElement('img');
                     img.src = url; img.alt = `Gallery photo ${i + 1}`;
                     img.loading = 'lazy';
-                    img.onerror = () => { slide.innerHTML = '<span class="placeholder-text">Image unavailable</span>'; };
+                    img.dataset.broken = '0';
+
+                    img.onerror = () => {
+                        img.dataset.broken = '1';
+                        slide.innerHTML = '<span class="placeholder-text">Image unavailable</span>';
+                    };
+
                     slide.appendChild(img);
+
                     slide.addEventListener('click', () => {
+                        if (img.dataset.broken === '1' || img.naturalWidth === 0) return;
                         img.classList.add('clicking');
                         setTimeout(() => {
                             img.classList.remove('clicking');
                             openLightbox(i);
                         }, 250);
                     });
+
                     this.stageEl.appendChild(slide);
                     this.slides.push(slide);
 
@@ -1010,20 +1049,24 @@
                 this.goTo(0);
                 this.updateCounter();
             },
+
             showSlide(i) {
                 this.slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
                 this.dotsEl.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
                 this.updateCounter();
             },
+
             updateCounter() {
                 if (!this.counterEl) return;
                 this.counterEl.textContent = `${this.index + 1} / ${this.slides.length}`;
             },
+
             goTo(i) {
                 if (this.slides.length === 0) return;
                 this.index = ((i % this.slides.length) + this.slides.length) % this.slides.length;
                 this.showSlide(this.index);
             },
+
             start() {
                 this.stop();
                 if (this.slides.length <= 1) return;
@@ -1038,6 +1081,7 @@
                 };
                 loop();
             },
+
             stop() {
                 this.running = false;
                 if (this.timer) { clearTimeout(this.timer); this.timer = null; }
@@ -1048,13 +1092,11 @@
         // UI REVEAL / HIDE
         // ============================================================
         let uiRevealed = false;
-
         function revealUI() {
             if (uiRevealed) return;
             uiRevealed = true;
             document.getElementById('navbar').classList.add('visible');
         }
-
         function hideUI() {
             uiRevealed = false;
             document.getElementById('navbar').classList.remove('visible');
@@ -1062,13 +1104,17 @@
 
         // ============================================================
         // AUTO TOUR
+        // Gallery + Godparents share heroGodparents:
+        //   - Gallery starts it fresh
+        //   - Godparents lets it continue (no restart)
+        //   - Leaving to another section switches to that section's sound
         // ============================================================
         const AutoTour = {
             sequence: ['venue', 'gallery', 'godparents', 'gifts', 'dresscode'],
             soundFor: {
                 venue:      'heroVenue',
-                gallery:    'heroGodparents',
-                godparents: 'heroGodparents',
+                gallery:    'heroGodparents',   // shared with godparents
+                godparents: 'heroGodparents',   // shared with gallery
                 gifts:      'heroGifts',
                 dresscode:  'heroDresscode'
             },
@@ -1122,6 +1168,7 @@
                 const required = ['venue', 'gallery', 'godparents', 'gifts', 'dresscode'];
                 const allVisited = required.every(s => this.sectionsVisited.has(s));
 
+                // Tour ends when we return to venue after visiting everything
                 if (sectionId === 'venue' && allVisited) {
                     revealUI();
                     Carousel.stop();
@@ -1139,12 +1186,17 @@
                 const carouselMs = photoCount * Carousel.seconds * 1000;
 
                 let waitMs;
+                let playSound = true;
+
                 if (sectionId === 'gallery') {
+                    // Start heroGodparents fresh; wait for full carousel cycle.
                     waitMs = carouselMs;
                 } else if (sectionId === 'godparents') {
+                    // CONTINUE heroGodparents from gallery — do not restart.
+                    // Wait only for the remaining time of the shared sound.
+                    playSound = false;
                     const remaining = AudioManager.getCurrentButtonRemainingMs();
-                    if (remaining > 0) waitMs = remaining;
-                    else waitMs = this.defaultNoSoundSeconds * 1000;
+                    waitMs = remaining > 0 ? remaining : this.defaultNoSoundSeconds * 1000;
                 } else if (soundDuration > 0) {
                     waitMs = Math.min(soundDuration, this.maxSoundSeconds) * 1000;
                 } else {
@@ -1153,10 +1205,8 @@
 
                 if (!this.running || myGen !== this.generation) return;
 
-                if (sectionId === 'gallery') {
-                    AudioManager.playButton('heroGodparents', { interrupt: true });
-                } else if (sectionId !== 'godparents') {
-                    if (snd) AudioManager.playButton(snd, { interrupt: true });
+                if (playSound && snd) {
+                    AudioManager.playButton(snd, { interrupt: true });
                 }
 
                 this.animateProgress(waitMs + this.pauseAfterSound);
@@ -1197,13 +1247,30 @@
 
         // ============================================================
         // MANUAL NAVIGATION
+        // Gallery ↔ Godparents share heroGodparents — continue, don't restart.
+        // Any other transition switches to the destination's sound.
         // ============================================================
         function navigateTo(sectionId, soundKey) {
+            // Capture prev section BEFORE switching
+            const prevEl = document.querySelector('.section.active');
+            const prevSection = prevEl ? prevEl.id : null;
+
             AutoTour.stop();
             showSection(sectionId);
 
             if (soundKey) {
-                AudioManager.playIfNotSamePlaying(soundKey, { interrupt: true });
+                const sharedPair =
+                    (prevSection === 'gallery'    && sectionId === 'godparents') ||
+                    (prevSection === 'godparents' && sectionId === 'gallery');
+
+                if (sharedPair) {
+                    // Continue if still playing; otherwise start fresh.
+                    if (!AudioManager.isButtonSoundPlaying()) {
+                        AudioManager.playButton(soundKey, { interrupt: true });
+                    }
+                } else {
+                    AudioManager.playIfNotSamePlaying(soundKey, { interrupt: true });
+                }
             }
 
             if (sectionId === 'gallery') {
@@ -1273,23 +1340,20 @@
             void lightboxImg.offsetWidth;
             lightboxImg.classList.add('magical');
             lightbox.classList.add('active');
-
             startLightboxAutoAdvance();
         }
 
         function closeLightbox() {
             stopLightboxAutoAdvance();
-
             lightbox.classList.remove('active');
-            if (document.getElementById('gallery').classList.contains('active')) {
+            const galleryActive = document.getElementById('gallery').classList.contains('active');
+            if (galleryActive && !AutoTour.running) {
                 Carousel.start();
             }
         }
 
         function navigateLightbox(direction) {
-            if (direction !== 0) {
-                startLightboxAutoAdvance();
-            }
+            if (direction !== 0) startLightboxAutoAdvance();
 
             lightboxImg.classList.add('transitioning');
             setTimeout(() => {
@@ -1344,15 +1408,9 @@
         // ============================================================
         // START BUTTON (View Invitation)
         // ============================================================
-        document.getElementById('view-invite-btn').addEventListener('click', () => {
-            // ★ iOS FIX: i-unlock lahat ng audio elements sa loob ng user gesture
-            AudioManager.unlockAllForIOS();
-
-            // Background music
+        document.getElementById('view-invite-btn').addEventListener('click', async () => {
+            await AudioManager.unlockAllForIOS();
             AudioManager.playBackgroundNow();
-
-            const navHome = document.getElementById('nav-home');
-            if (navHome) navHome.style.display = 'none';
 
             hideUI();
             AutoTour.start();
@@ -1382,12 +1440,12 @@
             const ninangsList = document.getElementById('ninangs-list');
             ninongsList.innerHTML = '';
             ninangsList.innerHTML = '';
-            EVENT_DATA.ninongs.forEach(name => {
+            (EVENT_DATA.ninongs || []).forEach(name => {
                 const li = document.createElement('li');
                 li.textContent = name;
                 ninongsList.appendChild(li);
             });
-            EVENT_DATA.ninangs.forEach(name => {
+            (EVENT_DATA.ninangs || []).forEach(name => {
                 const li = document.createElement('li');
                 li.textContent = name;
                 ninangsList.appendChild(li);
@@ -1395,33 +1453,39 @@
         }
 
         function populateGiftIdeas() {
-            document.getElementById('gift-message').textContent = EVENT_DATA.giftMessage;
-            document.getElementById('gift-note').textContent = EVENT_DATA.giftNote;
+            document.getElementById('gift-message').textContent = EVENT_DATA.giftMessage || '';
+            document.getElementById('gift-note').textContent    = EVENT_DATA.giftNote    || '';
         }
 
         function populateDressCode() {
-            document.getElementById('dresscode-message').textContent = EVENT_DATA.dressCodeMessage;
-            document.getElementById('dresscode-note').textContent = EVENT_DATA.dressCodeNote;
+            document.getElementById('dresscode-message').textContent = EVENT_DATA.dressCodeMessage || '';
+            document.getElementById('dresscode-note').textContent    = EVENT_DATA.dressCodeNote    || '';
         }
 
         function populateVenueInfo() {
-            document.getElementById('event-date').textContent = EVENT_DATA.date;
-            document.getElementById('event-time').textContent = EVENT_DATA.time;
-            document.getElementById('event-location').textContent = EVENT_DATA.location;
-            document.getElementById('event-location-address').textContent = EVENT_DATA.locationAddress;
+            document.getElementById('event-date').textContent = EVENT_DATA.date || '';
+            document.getElementById('event-time').textContent = EVENT_DATA.time || '';
+            document.getElementById('event-location').textContent = EVENT_DATA.location || '';
+            document.getElementById('event-location-address').textContent = EVENT_DATA.locationAddress || '';
 
             const churchMapLink = document.getElementById('church-map-link');
-            if (EVENT_DATA.locationMapUrl) churchMapLink.href = EVENT_DATA.locationMapUrl;
-            else churchMapLink.style.display = 'none';
+            if (EVENT_DATA.locationMapUrl) {
+                churchMapLink.href = EVENT_DATA.locationMapUrl;
+            } else {
+                churchMapLink.style.display = 'none';
+            }
 
-            document.getElementById('reception-venue').textContent = EVENT_DATA.receptionVenue;
-            document.getElementById('reception-branch').textContent = EVENT_DATA.receptionBranch;
-            document.getElementById('reception-address').textContent = EVENT_DATA.receptionAddress;
-            document.getElementById('reception-time').textContent = EVENT_DATA.receptionTime;
+            document.getElementById('reception-venue').textContent = EVENT_DATA.receptionVenue || '';
+            document.getElementById('reception-branch').textContent = EVENT_DATA.receptionBranch || '';
+            document.getElementById('reception-address').textContent = EVENT_DATA.receptionAddress || '';
+            document.getElementById('reception-time').textContent = EVENT_DATA.receptionTime || '';
 
             const mapLink = document.getElementById('reception-map-link');
-            if (EVENT_DATA.receptionMapUrl) mapLink.href = EVENT_DATA.receptionMapUrl;
-            else mapLink.style.display = 'none';
+            if (EVENT_DATA.receptionMapUrl) {
+                mapLink.href = EVENT_DATA.receptionMapUrl;
+            } else {
+                mapLink.style.display = 'none';
+            }
         }
 
         function createGlitter() {
@@ -1457,7 +1521,7 @@
 
             loadBackgroundImage();
             loadSingleImage('church-image-container', PHOTOS.church, 'Church', 'Church image unavailable');
-            loadSingleImage('mcdo-image-container', PHOTOS.mcdo, "McDonald's", "🍟 McDo Party!");
+            loadSingleImage('mcdo-image-container',   PHOTOS.mcdo,   "McDonald's", "🍟 McDo Party!");
             loadGallery();
             createGlitter();
 
