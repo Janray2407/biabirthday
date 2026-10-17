@@ -85,10 +85,16 @@
             cursor: pointer; text-decoration: none;
             box-shadow: 0 4px 15px rgba(138,43,226,0.4);
             transition: all 0.3s ease;
+            min-width: 220px;
         }
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(138,43,226,0.6);
+        }
+        .btn:disabled {
+            cursor: wait;
+            opacity: 0.65;
+            box-shadow: 0 2px 8px rgba(138,43,226,0.2);
         }
 
         .tour-progress {
@@ -421,7 +427,7 @@
             .content { padding: 1.2rem 0.9rem; }
             .content h1 { font-size: 1.7rem; margin-bottom: 1rem; }
             .content > p { font-size: 0.95rem; margin-bottom: 0.8rem; }
-            .btn { padding: 13px 32px; font-size: 1rem; }
+            .btn { padding: 13px 32px; font-size: 1rem; min-width: 180px; }
 
             .container { 
                 padding: 0.8rem; 
@@ -767,9 +773,6 @@
                 });
             },
 
-            // ★ iOS UNLOCK:
-            //  - Huwag i-pause ang background audio (para tumuloy siya sa playBackgroundNow)
-            //  - I-pause lang ang button sounds pagkatapos mag-unlock
             unlockAllForIOS() {
                 if (this.iosUnlocked) return;
                 this.iosUnlocked = true;
@@ -789,10 +792,8 @@
                     if (p && typeof p.then === 'function') {
                         p.then(() => {
                             if (isBackground) {
-                                // Background: hayaan mag-play, ibalik lang volume
                                 a.volume = origVol;
                             } else {
-                                // Button sounds: i-pause agad
                                 try { a.pause(); a.currentTime = 0; } catch (e) {}
                                 a.volume = origVol;
                             }
@@ -827,11 +828,9 @@
                 })));
             },
 
-            // ★ FIXED: may retry logic + fallback + proper volume restoration
             playBackgroundNow() {
                 if (!this.background) return;
                 if (!this.background.paused) {
-                    // Already playing — just make sure volume is correct
                     this.background.volume = AUDIO_SETTINGS.background.volume;
                     return;
                 }
@@ -845,7 +844,6 @@
                         p.catch(err => {
                             console.warn(`[Audio] Background play attempt ${attempt} failed:`, err.message);
                             if (attempt < 3) {
-                                // Retry up to 3 times
                                 setTimeout(() => doPlay(attempt + 1), 200 * attempt);
                             }
                         });
@@ -1019,7 +1017,8 @@
                     slide.dataset.index = i;
                     const img = document.createElement('img');
                     img.src = url; img.alt = `Gallery photo ${i + 1}`;
-                    img.loading = 'lazy';
+                    // ★ Changed from 'lazy' to 'eager' — photos are already preloaded
+                    img.loading = 'eager';
                     img.onerror = () => { slide.innerHTML = '<span class="placeholder-text">Image unavailable</span>'; };
                     slide.appendChild(img);
                     slide.addEventListener('click', () => {
@@ -1291,6 +1290,42 @@
         }
 
         // ============================================================
+        // ★ PRELOAD ALL PHOTOS (para ready bago i-click ang button)
+        // ============================================================
+        function preloadAllPhotos(onProgress) {
+            const allPaths = [
+                PHOTOS.background,
+                PHOTOS.church,
+                PHOTOS.mcdo,
+                ...PHOTOS.gallery
+            ];
+
+            let loaded = 0;
+            const total = allPaths.length;
+
+            const promises = allPaths.map(path => new Promise(resolve => {
+                const img = new Image();
+                const done = (ok) => {
+                    loaded++;
+                    if (typeof onProgress === 'function') {
+                        onProgress(loaded, total);
+                    }
+                    resolve({ path, ok });
+                };
+                img.onload  = () => done(true);
+                img.onerror = () => done(false);
+                img.src = getPublicUrl(path);
+            }));
+
+            return Promise.all(promises).then(results => {
+                const failed = results.filter(r => !r.ok);
+                console.log(`[Preload] ${total - failed.length}/${total} photos loaded`);
+                if (failed.length) console.warn('[Preload] Failed:', failed.map(f => f.path));
+                return results;
+            });
+        }
+
+        // ============================================================
         // LIGHTBOX
         // ============================================================
         const lightbox = document.getElementById('lightbox');
@@ -1373,15 +1408,12 @@
         // ★ START BUTTON — AUTO-PLAY BACKGROUND MUSIC FIX ★
         // ============================================================
         document.getElementById('view-invite-btn').addEventListener('click', () => {
-            // Step 1: Unlock all audio within the user gesture (iOS requirement)
             AudioManager.unlockAllForIOS();
 
-            // Step 2: Play background music — delayed para matapos muna ang unlock cycle
             setTimeout(() => {
                 AudioManager.playBackgroundNow();
             }, 100);
 
-            // Step 3: Hide home nav link & start tour
             const navHome = document.getElementById('nav-home');
             if (navHome) navHome.style.display = 'none';
 
@@ -1500,6 +1532,30 @@
                     AudioManager.background.play().catch(() => {});
                 }
             });
+
+            // ============================================================
+            // ★ BLOCK BUTTON UNTIL PHOTOS ARE PRELOADED
+            // ============================================================
+            const startBtn = document.getElementById('view-invite-btn');
+            const originalBtnText = startBtn.textContent;
+
+            startBtn.disabled = true;
+            startBtn.textContent = 'Loading photos… 0%';
+
+            const progressHandler = (loaded, total) => {
+                const pct = Math.round((loaded / total) * 100);
+                startBtn.textContent = `Loading photos… ${pct}%`;
+            };
+
+            try {
+                await preloadAllPhotos(progressHandler);
+            } catch (e) {
+                console.warn('[Preload] Something went wrong, continuing anyway:', e);
+            }
+
+            startBtn.disabled = false;
+            startBtn.textContent = originalBtnText;
+            console.log('[Preload] Done — button enabled ✓');
         });
     </script>
 </body>
