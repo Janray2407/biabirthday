@@ -223,16 +223,13 @@
         .carousel-slide img {
             width: 100%; height: 100%;
             object-fit: cover; border-radius: 20px;
-            /* ★ Picture animation */
             transition: transform 0.3s ease, filter 0.3s ease;
             cursor: pointer;
         }
-        /* ★ Scale-down pag pinindot */
         .carousel-slide img:active {
             transform: scale(0.97);
             filter: brightness(1.15);
         }
-        /* ★ Scale-up pag clinick */
         .carousel-slide img.clicking {
             transform: scale(1.08);
             filter: brightness(1.3);
@@ -636,7 +633,7 @@
                     <div class="carousel-arrow carousel-next" id="carousel-next" title="Next photo">&#10095;</div>
                 </div>
                 <div class="carousel-dots" id="carousel-dots"></div>
-                <div class="carousel-counter" id="carousel-counter">1 / 12</div>
+                <div class="carousel-counter" id="carousel-counter">1 / 15</div>
             </div>
         </section>
 
@@ -715,7 +712,7 @@
         }
 
         // ============================================================
-        // AUDIO MANAGER
+        // AUDIO MANAGER  (iOS-friendly)
         // ============================================================
         const AudioManager = {
             background: null,
@@ -725,6 +722,7 @@
             fadeTimer: null,
             currentButton: null,
             lastPlayedKey: null,
+            iosUnlocked: false,
 
             initBackground() {
                 this.background = new Audio();
@@ -758,6 +756,39 @@
                     audio.preload = 'auto';
                     audio.crossOrigin = 'anonymous';
                     this.sounds[key] = audio;
+                });
+            },
+
+            // ★ iOS UNLOCK: i-play lahat ng audio sa loob ng user gesture
+            //   (muted/volume=0) para ma-unlock sila ng iOS Safari.
+            unlockAllForIOS() {
+                if (this.iosUnlocked) return;
+                this.iosUnlocked = true;
+
+                const allAudios = [
+                    this.background,
+                    ...Object.values(this.sounds)
+                ].filter(Boolean);
+
+                allAudios.forEach(a => {
+                    const origVol = a.volume;
+                    a.volume = 0;
+                    let p;
+                    try { p = a.play(); } catch (e) { a.volume = origVol; return; }
+                    if (p && typeof p.then === 'function') {
+                        p.then(() => {
+                            // Successfully unlocked — i-pause at ibalik sa 0
+                            try {
+                                a.pause();
+                                a.currentTime = 0;
+                            } catch (e) {}
+                            a.volume = origVol;
+                        }).catch(() => {
+                            a.volume = origVol;
+                        });
+                    } else {
+                        a.volume = origVol;
+                    }
                 });
             },
 
@@ -855,11 +886,16 @@
                 return this._startPlayer(source, soundKey, options);
             },
 
+            // ★ iOS-safe: HUWAG mag-clone. Gamitin ang original na audio element.
             _startPlayer(source, soundKey, options) {
-                const player = source.cloneNode();
+                const player = source;   // ← HUWAG cloneNode
+
+                try {
+                    player.pause();
+                    player.currentTime = 0;
+                } catch (e) {}
+
                 player.volume = AUDIO_SETTINGS.buttons.volume;
-                player.crossOrigin = 'anonymous';
-                player.preload = 'auto';
 
                 this.currentButton = player;
                 this.lastPlayedKey = soundKey;
@@ -870,6 +906,8 @@
                 let finished = false;
                 const finish = () => {
                     if (finished) return; finished = true;
+                    player.removeEventListener('ended', finish);
+                    player.removeEventListener('error', finish);
                     if (this.currentButton === player) {
                         this.currentButton = null;
                         this.lastPlayedKey = null;
@@ -880,10 +918,13 @@
                 player.addEventListener('ended', finish, { once: true });
                 player.addEventListener('error', finish, { once: true });
 
-                player.play().catch(err => {
-                    console.warn(`Button sound "${soundKey}" failed:`, err.message);
-                    finish();
-                });
+                const p = player.play();
+                if (p && typeof p.catch === 'function') {
+                    p.catch(err => {
+                        console.warn(`Button sound "${soundKey}" failed:`, err.message);
+                        finish();
+                    });
+                }
 
                 return player;
             },
@@ -950,7 +991,6 @@
                     img.loading = 'lazy';
                     img.onerror = () => { slide.innerHTML = '<span class="placeholder-text">Image unavailable</span>'; };
                     slide.appendChild(img);
-                    /* Click transition — scale up bago mag-lightbox */
                     slide.addEventListener('click', () => {
                         img.classList.add('clicking');
                         setTimeout(() => {
@@ -1187,7 +1227,7 @@
         let galleryImages = [];
         let currentImageIndex = 0;
         let lightboxTimer = null;
-        const LIGHTBOX_INTERVAL_MS = 3000;  // 3 seconds per photo
+        const LIGHTBOX_INTERVAL_MS = 3000;
 
         // ============================================================
         // IMAGES
@@ -1234,12 +1274,10 @@
             lightboxImg.classList.add('magical');
             lightbox.classList.add('active');
 
-            // ★ Start auto-advance sa lightbox (movie slideshow)
             startLightboxAutoAdvance();
         }
 
         function closeLightbox() {
-            // ★ Stop auto-advance
             stopLightboxAutoAdvance();
 
             lightbox.classList.remove('active');
@@ -1249,8 +1287,6 @@
         }
 
         function navigateLightbox(direction) {
-            // ★ I-reset yung timer kada manual navigation
-            //   Para pag pinindot mo yung arrow, mag-restart yung 3s countdown
             if (direction !== 0) {
                 startLightboxAutoAdvance();
             }
@@ -1265,11 +1301,10 @@
             }, 400);
         }
 
-        // ★ Auto-advance sa lightbox (movie slideshow)
         function startLightboxAutoAdvance() {
             stopLightboxAutoAdvance();
             lightboxTimer = setInterval(() => {
-                navigateLightbox(1);  // next photo
+                navigateLightbox(1);
             }, LIGHTBOX_INTERVAL_MS);
         }
 
@@ -1310,6 +1345,10 @@
         // START BUTTON (View Invitation)
         // ============================================================
         document.getElementById('view-invite-btn').addEventListener('click', () => {
+            // ★ iOS FIX: i-unlock lahat ng audio elements sa loob ng user gesture
+            AudioManager.unlockAllForIOS();
+
+            // Background music
             AudioManager.playBackgroundNow();
 
             const navHome = document.getElementById('nav-home');
