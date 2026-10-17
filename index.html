@@ -574,7 +574,7 @@
             <div class="content">
                 <h1>🎉 Azrianna Bia's Birthday 🎂</h1>
                 <p>You're invited to celebrate this special day!</p>
-                <button class="btn" id="view-invite-btn">Open Invitation</button>
+                <button class="btn" id="view-invite-btn">View Invitation</button>
             </div>
         </section>
 
@@ -633,7 +633,7 @@
                     <div class="carousel-arrow carousel-next" id="carousel-next" title="Next photo">&#10095;</div>
                 </div>
                 <div class="carousel-dots" id="carousel-dots"></div>
-                <div class="carousel-counter" id="carousel-counter">1 / 15</div>
+                <div class="carousel-counter" id="carousel-counter">1 / 12</div>
             </div>
         </section>
 
@@ -712,7 +712,7 @@
         }
 
         // ============================================================
-        // AUDIO MANAGER  (iOS-friendly)
+        // AUDIO MANAGER  (iOS-friendly, auto-play fixed)
         // ============================================================
         const AudioManager = {
             background: null,
@@ -723,6 +723,7 @@
             currentButton: null,
             lastPlayedKey: null,
             iosUnlocked: false,
+            bgPlayAttempted: false,
 
             initBackground() {
                 this.background = new Audio();
@@ -734,18 +735,25 @@
 
                 this.background.addEventListener('play', () => {
                     this.isMuted = false;
-                    const btn = document.getElementById('music-toggle');
-                    const icon = document.getElementById('music-icon');
-                    if (btn) { btn.classList.add('playing'); btn.classList.remove('muted'); }
-                    if (icon) icon.textContent = '🔊';
+                    this.updateMusicUI(true);
                 });
                 this.background.addEventListener('pause', () => {
                     this.isMuted = true;
-                    const btn = document.getElementById('music-toggle');
-                    const icon = document.getElementById('music-icon');
-                    if (btn) { btn.classList.remove('playing'); btn.classList.add('muted'); }
-                    if (icon) icon.textContent = '🔇';
+                    this.updateMusicUI(false);
                 });
+                this.background.addEventListener('playing', () => {
+                    console.log('[Audio] Background music is now playing ✓');
+                });
+            },
+
+            updateMusicUI(isPlaying) {
+                const btn = document.getElementById('music-toggle');
+                const icon = document.getElementById('music-icon');
+                if (btn) {
+                    btn.classList.toggle('playing', isPlaying);
+                    btn.classList.toggle('muted', !isPlaying);
+                }
+                if (icon) icon.textContent = isPlaying ? '🔊' : '🔇';
             },
 
             preloadSounds() {
@@ -759,8 +767,9 @@
                 });
             },
 
-            // ★ iOS UNLOCK: i-play lahat ng audio sa loob ng user gesture
-            //   (muted/volume=0) para ma-unlock sila ng iOS Safari.
+            // ★ iOS UNLOCK:
+            //  - Huwag i-pause ang background audio (para tumuloy siya sa playBackgroundNow)
+            //  - I-pause lang ang button sounds pagkatapos mag-unlock
             unlockAllForIOS() {
                 if (this.iosUnlocked) return;
                 this.iosUnlocked = true;
@@ -771,18 +780,22 @@
                 ].filter(Boolean);
 
                 allAudios.forEach(a => {
+                    const isBackground = a === this.background;
                     const origVol = a.volume;
                     a.volume = 0;
                     let p;
                     try { p = a.play(); } catch (e) { a.volume = origVol; return; }
+
                     if (p && typeof p.then === 'function') {
                         p.then(() => {
-                            // Successfully unlocked — i-pause at ibalik sa 0
-                            try {
-                                a.pause();
-                                a.currentTime = 0;
-                            } catch (e) {}
-                            a.volume = origVol;
+                            if (isBackground) {
+                                // Background: hayaan mag-play, ibalik lang volume
+                                a.volume = origVol;
+                            } else {
+                                // Button sounds: i-pause agad
+                                try { a.pause(); a.currentTime = 0; } catch (e) {}
+                                a.volume = origVol;
+                            }
                         }).catch(() => {
                             a.volume = origVol;
                         });
@@ -814,20 +827,42 @@
                 })));
             },
 
+            // ★ FIXED: may retry logic + fallback + proper volume restoration
             playBackgroundNow() {
                 if (!this.background) return;
-                if (this.background.paused) {
+                if (!this.background.paused) {
+                    // Already playing — just make sure volume is correct
                     this.background.volume = AUDIO_SETTINGS.background.volume;
-                    this.background.play().catch(err => {
-                        console.warn('[Audio] Background play failed:', err);
-                    });
+                    return;
                 }
+
+                this.bgPlayAttempted = true;
+                this.background.volume = AUDIO_SETTINGS.background.volume;
+
+                const doPlay = (attempt = 1) => {
+                    const p = this.background.play();
+                    if (p && typeof p.catch === 'function') {
+                        p.catch(err => {
+                            console.warn(`[Audio] Background play attempt ${attempt} failed:`, err.message);
+                            if (attempt < 3) {
+                                // Retry up to 3 times
+                                setTimeout(() => doPlay(attempt + 1), 200 * attempt);
+                            }
+                        });
+                    }
+                };
+
+                doPlay();
             },
 
             toggleBackground() {
                 if (!this.background) return;
-                if (this.background.paused) this.background.play().catch(() => {});
-                else this.background.pause();
+                if (this.background.paused) {
+                    this.background.volume = AUDIO_SETTINGS.background.volume;
+                    this.background.play().catch(() => {});
+                } else {
+                    this.background.pause();
+                }
             },
 
             stopCurrentButtonSound() {
@@ -886,17 +921,14 @@
                 return this._startPlayer(source, soundKey, options);
             },
 
-            // ★ iOS-safe: HUWAG mag-clone. Gamitin ang original na audio element.
             _startPlayer(source, soundKey, options) {
-                const player = source;   // ← HUWAG cloneNode
-
+                const player = source;
                 try {
                     player.pause();
                     player.currentTime = 0;
                 } catch (e) {}
 
                 player.volume = AUDIO_SETTINGS.buttons.volume;
-
                 this.currentButton = player;
                 this.lastPlayedKey = soundKey;
 
@@ -925,7 +957,6 @@
                         finish();
                     });
                 }
-
                 return player;
             },
 
@@ -1273,13 +1304,11 @@
             void lightboxImg.offsetWidth;
             lightboxImg.classList.add('magical');
             lightbox.classList.add('active');
-
             startLightboxAutoAdvance();
         }
 
         function closeLightbox() {
             stopLightboxAutoAdvance();
-
             lightbox.classList.remove('active');
             if (document.getElementById('gallery').classList.contains('active')) {
                 Carousel.start();
@@ -1290,7 +1319,6 @@
             if (direction !== 0) {
                 startLightboxAutoAdvance();
             }
-
             lightboxImg.classList.add('transitioning');
             setTimeout(() => {
                 currentImageIndex = (currentImageIndex + direction + galleryImages.length) % galleryImages.length;
@@ -1342,15 +1370,18 @@
         }
 
         // ============================================================
-        // START BUTTON (View Invitation)
+        // ★ START BUTTON — AUTO-PLAY BACKGROUND MUSIC FIX ★
         // ============================================================
         document.getElementById('view-invite-btn').addEventListener('click', () => {
-            // ★ iOS FIX: i-unlock lahat ng audio elements sa loob ng user gesture
+            // Step 1: Unlock all audio within the user gesture (iOS requirement)
             AudioManager.unlockAllForIOS();
 
-            // Background music
-            AudioManager.playBackgroundNow();
+            // Step 2: Play background music — delayed para matapos muna ang unlock cycle
+            setTimeout(() => {
+                AudioManager.playBackgroundNow();
+            }, 100);
 
+            // Step 3: Hide home nav link & start tour
             const navHome = document.getElementById('nav-home');
             if (navHome) navHome.style.display = 'none';
 
@@ -1462,6 +1493,13 @@
             createGlitter();
 
             AudioManager.preloadAllDurations();
+
+            // ★ Resume background music if it got paused when tab was hidden
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && AudioManager.bgPlayAttempted && AudioManager.background && AudioManager.background.paused && !AudioManager.isMuted) {
+                    AudioManager.background.play().catch(() => {});
+                }
+            });
         });
     </script>
 </body>
