@@ -46,7 +46,7 @@ const EVENT_DATA = {
     receptionVenue: "McDonald's",
     receptionBranch: 'San Juan Batangas',
     receptionAddress: "2 General Luna Street, Poblacion, San Juan, Batangas",
-    receptionTime: '5:30 PM',
+    receptionTime: '08:00 AM',
     receptionMapUrl: 'https://www.google.com/maps/search/McDonalds+San+Juan+Batangas',
 
     ninongs: [
